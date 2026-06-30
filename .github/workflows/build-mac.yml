@@ -23,7 +23,7 @@ jobs:
         run: cp config-rr.json config.json
 
       - name: Build RealmRender Mac
-        run: npx electron-builder --mac --config electron-builder-rr.json
+        run: npx electron-builder --mac --config electron-builder-rr.json --publish never
 
       - name: Upload RealmRender Mac
         uses: actions/upload-artifact@v4
