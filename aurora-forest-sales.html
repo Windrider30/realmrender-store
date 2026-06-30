@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurora Forest Generator — RealmRender</title>
+
+<!-- Spark SEO + Social -->
+<meta name="description" content="Generate stunning aurora forest AI art prompts instantly. No skill needed. One-time purchase, unlimited renders. By RealmRender.">
+<meta name="theme-color" content="#6A00FF">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aurora Forest Generator — RealmRender">
+<meta property="og:description" content="Generate stunning aurora forest AI art prompts instantly. No skill needed. One-time purchase, unlimited renders.">
+<meta property="og:image" content="">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Aurora Forest Generator — RealmRender">
+<meta name="twitter:description" content="Generate stunning aurora forest AI art prompts instantly. No skill needed. One-time purchase, unlimited renders.">
+<meta name="twitter:image" content="">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:ital,wght@0,200;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   SPARK DESIGN TOKENS — RealmRender
+   ═══════════════════════════════════════ */
+:root {
+  --void: #0D0D0D;
+  --void2: #0f0f16;
+  --arcane: #6A00FF;
+  --arcane-glow: rgba(106,0,255,0.4);
+  --cyan: #00F0FF;
+  --cyan-glow: rgba(0,240,255,0.35);
+  --magenta: #FF2E88;
+  --magenta-glow: rgba(255,46,136,0.35);
+  --electric: #3A86FF;
+  --ash: #B0B0B0;
+  --white: #F0F0FF;
+  --font-display: 'Cinzel Decorative', serif;
+  --font-head: 'Rajdhani', sans-serif;
+  --font-body: 'Exo 2', sans-serif;
+  --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm:   clamp(0.875rem, 0.82rem + 0.28vw, 1rem);
+  --text-base: clamp(1rem, 0.93rem + 0.35vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 1rem + 0.63vw, 1.375rem);
+  --text-xl:   clamp(1.25rem, 1.05rem + 1vw, 1.75rem);
+  --text-2xl:  clamp(1.5rem, 1.2rem + 1.5vw, 2.25rem);
+  --text-3xl:  clamp(1.875rem, 1.4rem + 2.4vw, 3rem);
+  --text-4xl:  clamp(2.25rem, 1.6rem + 3.25vw, 4rem);
+  --leading-tight: 1.2;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --tracking-tight: -0.025em;
+  --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+  --space-6: 1.5rem; --space-8: 2rem; --space-12: 3rem; --space-16: 4rem; --space-24: 6rem;
+  --radius-sm: 0.25rem; --radius-md: 0.5rem; --radius-lg: 1rem; --radius-xl: 1.5rem; --radius-full: 9999px;
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04);
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+  --z-base: 0; --z-raised: 10; --z-overlay: 100; --z-modal: 200; --z-toast: 300; --z-nav: 400;
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body { background:var(--void); color:var(--white); font-family:var(--font-body); overflow-x:hidden; cursor:none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *,*::before,*::after {
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;
+  }
+}
+
+/* ═══ CURSOR ═══ */
+.cursor { position:fixed; width:12px; height:12px; background:var(--cyan); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:transform 0.1s, width 0.15s, height 0.15s; mix-blend-mode:screen; }
+.cursor-ring { position:fixed; width:36px; height:36px; border:1px solid var(--arcane); border-radius:50%; pointer-events:none; z-index:9998; transform:translate(-50%,-50%); transition:all 0.18s ease; }
+
+/* ═══ CANVAS ═══ */
+#portal-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+/* ═══ SPARK HUD ═══ */
+.spark-hud { position:fixed; top:0; left:0; right:0; z-index:var(--z-nav); background:rgba(13,13,13,0.88); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid rgba(106,0,255,0.3); padding:0 24px; height:64px; display:flex; align-items:center; justify-content:space-between; }
+.hud-logo { text-decoration:none; display:flex; align-items:center; }
+.hud-logo img { height:44px; filter:drop-shadow(0 0 8px var(--arcane-glow)); }
+.hud-nav { display:flex; align-items:center; gap:4px; list-style:none; }
+.hud-nav a { display:flex; align-items:center; padding:10px 13px; color:var(--ash); text-decoration:none; font-family:var(--font-head); font-size:12px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; border-radius:6px; transition:color 0.2s, background 0.2s; min-height:44px; }
+.hud-nav a:hover, .hud-nav a.active { color:var(--cyan); background:rgba(0,240,255,0.07); }
+.hud-cta { background:linear-gradient(135deg,var(--arcane),var(--magenta))!important; color:var(--white)!important; border-radius:8px!important; padding:10px 18px!important; }
+.hud-burger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; padding:10px; min-width:44px; min-height:44px; align-items:center; justify-content:center; }
+.hud-burger span { display:block; width:24px; height:2px; background:var(--cyan); border-radius:2px; transition:transform 0.3s, opacity 0.3s; }
+.mobile-menu { display:none; position:fixed; top:64px; left:0; right:0; bottom:0; background:rgba(13,13,13,0.97); backdrop-filter:blur(20px); z-index:999; flex-direction:column; align-items:center; justify-content:center; gap:8px; }
+.mobile-menu.open { display:flex; }
+.mobile-menu a { color:var(--white); text-decoration:none; font-family:var(--font-head); font-size:22px; font-weight:600; letter-spacing:3px; text-transform:uppercase; padding:16px 40px; min-height:56px; display:flex; align-items:center; border-bottom:1px solid rgba(106,0,255,0.2); width:80%; justify-content:center; transition:color 0.2s; }
+.mobile-menu a:hover { color:var(--cyan); }
+@media(max-width:960px) { .hud-nav { display:none; } .hud-burger { display:flex; } }
+
+/* ═══ SPARK REVEAL ═══ */
+.spark-reveal { opacity:0; transform:translateY(40px); transition:opacity 0.7s ease, transform 0.7s ease; }
+.spark-reveal.revealed { opacity:1; transform:translateY(0); }
+.spark-reveal.delay-1 { transition-delay:0.1s; }
+.spark-reveal.delay-2 { transition-delay:0.2s; }
+.spark-reveal.delay-3 { transition-delay:0.3s; }
+.spark-reveal.delay-4 { transition-delay:0.4s; }
+
+/* ═══ HERO ═══ */
+.hero { position:relative; z-index:var(--z-raised); min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:100px 24px 60px; }
+.hero-eyebrow { font-family:var(--font-head); font-size:var(--text-xs); font-weight:700; letter-spacing:6px; text-transform:uppercase; color:var(--arcane); margin-bottom:20px; animation:fadeUp 0.8s ease both; }
+.hero-title { font-family:var(--font-display); font-size:var(--text-4xl); font-weight:900; line-height:var(--leading-tight); letter-spacing:var(--tracking-tight); margin-bottom:24px; animation:fadeUp 0.8s 0.15s ease both; }
+.hero-title .grad { background:linear-gradient(90deg,#22c55e,var(--cyan),var(--arcane)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; background-size:200% auto; animation:shimmer 4s linear infinite; }
+.hero-sub { font-size:var(--text-lg); font-weight:300; color:var(--ash); max-width:620px; line-height:var(--leading-relaxed); margin-bottom:44px; animation:fadeUp 0.8s 0.3s ease both; }
+.hero-actions { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; animation:fadeUp 0.8s 0.45s ease both; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes shimmer { to { background-position:200% center; } }
+
+/* ═══ BUTTONS ═══ */
+.spark-btn { position:relative; overflow:hidden; padding:16px 36px; border-radius:var(--radius-lg); font-family:var(--font-head); font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase; text-decoration:none; cursor:pointer; border:none; display:inline-flex; align-items:center; gap:10px; min-height:54px; transition:transform var(--transition-fast), box-shadow var(--transition-base); color:var(--white); }
+.spark-btn:active { transform:scale(0.97); }
+.btn-primary { background:linear-gradient(135deg,var(--arcane),var(--magenta)); box-shadow:0 0 28px var(--arcane-glow); }
+.btn-primary:hover { box-shadow:0 0 50px var(--arcane-glow); transform:translateY(-2px); }
+.btn-ghost { background:transparent; border:1px solid rgba(0,240,255,0.35); color:var(--cyan); box-shadow:0 0 16px rgba(0,240,255,0.1); }
+.btn-ghost:hover { background:rgba(0,240,255,0.07); transform:translateY(-1px); }
+
+/* ═══ SECTIONS ═══ */
+section { position:relative; z-index:var(--z-raised); padding:80px 24px; }
+.container { max-width:1200px; margin:0 auto; }
+.section-label { font-family:var(--font-head); font-size:var(--text-xs); font-weight:700; letter-spacing:6px; text-transform:uppercase; color:var(--arcane); margin-bottom:14px; }
+.section-title { font-family:var(--font-display); font-size:var(--text-3xl); font-weight:700; margin-bottom:14px; line-height:var(--leading-tight); }
+.section-sub { color:var(--ash); font-size:var(--text-base); line-height:var(--leading-relaxed); max-width:620px; margin-bottom:50px; }
+
+/* ═══ WHAT YOU GET ═══ */
+.features-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px; }
+.feature-card { background:rgba(106,0,255,0.06); border:1px solid rgba(106,0,255,0.2); border-radius:var(--radius-xl); padding:36px 28px; transition:transform var(--transition-base), border-color var(--transition-base), box-shadow var(--transition-base); }
+.feature-card:hover { transform:translateY(-6px); border-color:rgba(0,240,255,0.3); box-shadow:0 20px 60px rgba(106,0,255,0.2); }
+.feature-icon { font-size:40px; margin-bottom:18px; display:block; }
+.feature-title { font-family:var(--font-head); font-size:var(--text-xl); font-weight:700; margin-bottom:10px; }
+.feature-desc { color:var(--ash); font-size:var(--text-sm); line-height:var(--leading-relaxed); }
+
+/* ═══ HOW IT WORKS ═══ */
+.steps-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:32px; counter-reset:step; }
+.step-card { position:relative; background:rgba(0,240,255,0.03); border:1px solid rgba(0,240,255,0.15); border-radius:var(--radius-xl); padding:40px 28px 32px; text-align:center; counter-increment:step; }
+.step-card::before { content:counter(step); position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:36px; height:36px; background:linear-gradient(135deg,var(--arcane),var(--magenta)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:var(--font-head); font-size:16px; font-weight:700; color:var(--white); line-height:36px; text-align:center; }
+.step-title { font-family:var(--font-head); font-size:var(--text-lg); font-weight:700; margin-bottom:10px; margin-top:8px; }
+.step-desc { color:var(--ash); font-size:var(--text-sm); line-height:var(--leading-relaxed); }
+
+/* ═══ PAIN / SOLUTION ═══ */
+.pain-grid { display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:start; }
+@media(max-width:768px) { .pain-grid { grid-template-columns:1fr; } }
+.pain-col, .solution-col { border-radius:var(--radius-xl); padding:36px 32px; }
+.pain-col { background:rgba(255,46,136,0.06); border:1px solid rgba(255,46,136,0.2); }
+.solution-col { background:rgba(0,240,255,0.04); border:1px solid rgba(0,240,255,0.2); }
+.pain-col h3, .solution-col h3 { font-family:var(--font-head); font-size:var(--text-xl); font-weight:700; margin-bottom:20px; }
+.pain-col h3 { color:var(--magenta); }
+.solution-col h3 { color:var(--cyan); }
+.pain-list, .solution-list { list-style:none; display:flex; flex-direction:column; gap:14px; }
+.pain-list li, .solution-list li { font-size:var(--text-base); line-height:var(--leading-relaxed); color:var(--ash); padding-left:28px; position:relative; }
+.pain-list li::before { content:'✕'; position:absolute; left:0; color:var(--magenta); font-weight:700; }
+.solution-list li::before { content:'✓'; position:absolute; left:0; color:var(--cyan); font-weight:700; }
+
+/* ═══ SOCIAL PROOF ═══ */
+.testimonials-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:24px; }
+.testimonial-card { background:rgba(106,0,255,0.06); border:1px solid rgba(106,0,255,0.2); border-radius:var(--radius-xl); padding:32px 28px; }
+.testimonial-stars { color:#facc15; font-size:18px; margin-bottom:14px; letter-spacing:4px; }
+.testimonial-text { color:var(--ash); font-size:var(--text-base); line-height:var(--leading-relaxed); font-style:italic; margin-bottom:18px; }
+.testimonial-author { font-family:var(--font-head); font-size:var(--text-sm); font-weight:700; color:var(--white); letter-spacing:1px; }
+
+/* ═══ FAQ ═══ */
+.faq-list { max-width:800px; display:flex; flex-direction:column; gap:12px; }
+.faq-item { border:1px solid rgba(106,0,255,0.2); border-radius:var(--radius-lg); overflow:hidden; }
+.faq-q { width:100%; background:rgba(106,0,255,0.06); border:none; color:var(--white); font-family:var(--font-head); font-size:var(--text-base); font-weight:600; text-align:left; padding:18px 24px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; min-height:54px; transition:background var(--transition-fast); }
+.faq-q:hover { background:rgba(106,0,255,0.12); }
+.faq-q .arrow { transition:transform var(--transition-base); font-size:14px; color:var(--cyan); }
+.faq-item.open .faq-q .arrow { transform:rotate(180deg); }
+.faq-a { max-height:0; overflow:hidden; transition:max-height var(--transition-slow); }
+.faq-a-inner { padding:0 24px 20px; color:var(--ash); font-size:var(--text-sm); line-height:var(--leading-relaxed); }
+
+/* ═══ FINAL CTA ═══ */
+.final-cta { text-align:center; background:linear-gradient(180deg, transparent, rgba(106,0,255,0.08), transparent); }
+.final-cta .section-title { max-width:700px; margin-left:auto; margin-right:auto; margin-bottom:20px; }
+.final-cta .section-sub { margin-left:auto; margin-right:auto; margin-bottom:40px; }
+
+/* ═══ SPARK STICKY CTA ═══ */
+.sticky-cta { position:fixed; bottom:0; left:0; right:0; z-index:var(--z-toast); background:rgba(13,13,13,0.92); backdrop-filter:blur(16px); border-top:1px solid rgba(106,0,255,0.3); padding:12px 24px; display:flex; align-items:center; justify-content:center; gap:20px; transform:translateY(100%); transition:transform var(--transition-base); }
+.sticky-cta.visible { transform:translateY(0); }
+.sticky-cta-text { font-family:var(--font-head); font-size:var(--text-sm); font-weight:600; color:var(--ash); letter-spacing:1px; }
+.sticky-cta .spark-btn { padding:12px 28px; font-size:12px; min-height:44px; }
+@media(max-width:600px) { .sticky-cta-text { display:none; } }
+
+/* ═══ TOAST ═══ */
+.spark-toast-container { position:fixed; bottom:80px; right:24px; z-index:10000; display:flex; flex-direction:column; gap:12px; max-width:320px; pointer-events:none; }
+.spark-toast { background:rgba(13,13,13,0.95); backdrop-filter:blur(20px); border:1px solid rgba(106,0,255,0.4); border-radius:12px; padding:16px 20px; color:var(--white); font-family:var(--font-body); font-size:var(--text-sm); display:flex; align-items:center; gap:12px; pointer-events:all; animation:toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
+.spark-toast.out { animation:toastOut 0.3s ease forwards; }
+@keyframes toastIn { from { opacity:0; transform:translateX(100%); } to { opacity:1; transform:translateX(0); } }
+@keyframes toastOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(120%); } }
+
+/* ═══ FOOTER ═══ */
+footer { position:relative; z-index:var(--z-raised); border-top:1px solid rgba(106,0,255,0.2); padding:60px 24px 40px; background:rgba(0,0,0,0.6); }
+.footer-grid { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; margin-bottom:48px; }
+.footer-brand img { height:48px; margin-bottom:16px; filter:drop-shadow(0 0 8px var(--arcane-glow)); }
+.footer-brand p { color:var(--ash); font-size:var(--text-sm); line-height:var(--leading-relaxed); }
+.footer-col h4 { font-family:var(--font-head); font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--arcane); margin-bottom:20px; }
+.footer-col ul { list-style:none; }
+.footer-col ul li { margin-bottom:10px; }
+.footer-col ul a { color:var(--ash); text-decoration:none; font-size:var(--text-sm); transition:color 0.2s; }
+.footer-col ul a:hover { color:var(--cyan); }
+.footer-bottom { max-width:1200px; margin:0 auto; padding-top:24px; border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+.footer-bottom p { color:rgba(176,176,176,0.6); font-size:var(--text-xs); }
+.footer-bottom a { color:var(--arcane); text-decoration:none; }
+@media(max-width:768px) { .footer-grid { grid-template-columns:1fr 1fr; gap:32px; } .footer-brand { grid-column:1/-1; } }
+@media(max-width:480px) { .footer-grid { grid-template-columns:1fr; } }
+
+/* ═══ GALLERY PREVIEW STRIP ═══ */
+.gallery-strip { display:flex; gap:16px; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding:8px 0; }
+.gallery-strip::-webkit-scrollbar { display:none; }
+.gallery-strip-item { scroll-snap-align:start; flex:0 0 280px; height:360px; border-radius:var(--radius-xl); overflow:hidden; border:1px solid rgba(106,0,255,0.2); position:relative; background:linear-gradient(135deg, rgba(34,197,94,0.12), rgba(0,240,255,0.06)); display:flex; align-items:center; justify-content:center; font-size:80px; transition:transform var(--transition-base), box-shadow var(--transition-base); }
+.gallery-strip-item:hover { transform:translateY(-6px); box-shadow:0 20px 60px rgba(106,0,255,0.3); }
+.gallery-strip-item img { width:100%; height:100%; object-fit:cover; }
+@media(max-width:600px) { .gallery-strip-item { flex:0 0 220px; height:280px; } }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+<canvas id="portal-canvas"></canvas>
+
+<!-- ═══ SPARK HUD ═══ -->
+<header class="spark-hud">
+  <a href="index.html" class="hud-logo">
+    <img src="https://assets.cdn.filesafe.space/1zBBbC1hHp2VHtW9tU6S/media/6a129ffab3e0c02fe7da4d6f.png" alt="RealmRender">
+  </a>
+  <nav><ul class="hud-nav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="products.html" class="active">Products</a></li>
+    <li><a href="bundles.html">Bundles</a></li>
+    <li><a href="programs.html">Programs</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="free.html">Free Stuff</a></li>
+    <li><a href="blog.html">Blog</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="bundles.html" class="spark-btn hud-cta">Shop Now</a></li>
+  </ul></nav>
+  <button class="hud-burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+</header>
+<div class="mobile-menu" id="mobile-menu">
+  <a href="index.html">Home</a><a href="products.html">Products</a><a href="bundles.html">Bundles</a>
+  <a href="programs.html">Programs</a><a href="gallery.html">Gallery</a>
+  <a href="free.html">Free Stuff</a><a href="blog.html">Blog</a>
+  <a href="about.html">About</a><a href="contact.html">Contact</a>
+</div>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-eyebrow">🌲 RealmRender Generator</div>
+  <h1 class="hero-title">The <span class="grad">Aurora Forest</span> Generator</h1>
+  <p class="hero-sub">Generate breathtaking aurora forest AI art prompts in seconds. Enchanted woodlands bathed in northern lights — ready to render in any AI art platform. No prompt engineering skill required.</p>
+  <div class="hero-actions">
+    <a href="#" class="spark-btn btn-primary" id="hero-buy-btn">🛒 Get the Generator</a>
+    <a href="#how-it-works" class="spark-btn btn-ghost">See How It Works ↓</a>
+  </div>
+</section>
+
+<!-- ═══ PHOTO CUBE ═══ -->
+<script>
+(function () {
+  var FACES = [
+    { name: 'front',  css: 'translateZ({h}px)',                 normal: [ 0,  0,  1] },
+    { name: 'back',   css: 'rotateY(180deg) translateZ({h}px)', normal: [ 0,  0, -1] },
+    { name: 'left',   css: 'rotateY(-90deg) translateZ({h}px)', normal: [-1,  0,  0] },
+    { name: 'right',  css: 'rotateY(90deg) translateZ({h}px)',  normal: [ 1,  0,  0] },
+    { name: 'top',    css: 'rotateX(90deg) translateZ({h}px)',  normal: [ 0, -1,  0] },
+    { name: 'bottom', css: 'rotateX(-90deg) translateZ({h}px)', normal: [ 0,  1,  0] },
+  ];
+
+  function frontFace(rotX, rotY, faceUrls) {
+    var rx = rotX * Math.PI / 180, ry = rotY * Math.PI / 180;
+    var best = null, bestZ = -Infinity;
+    for (var i = 0; i < FACES.length; i++) {
+      var f = FACES[i];
+      var nx = f.normal[0], ny = f.normal[1], nz = f.normal[2];
+      var nz2 = -Math.sin(ry) * nx + Math.cos(ry) * nz;
+      var nz3 =  Math.sin(rx) * ny + Math.cos(rx) * nz2;
+      if (nz3 > bestZ) { bestZ = nz3; best = f.name; }
+    }
+    return (best && faceUrls[best]) ? faceUrls[best] : null;
+  }
+
+  var sharedOverlay = null;
+  function getOverlay() {
+    if (sharedOverlay) return sharedOverlay;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.92);align-items:center;justify-content:center;cursor:zoom-out;';
+    var img = document.createElement('img');
+    img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:12px;border:2px solid rgba(106,0,255,0.5);box-shadow:0 0 60px rgba(106,0,255,0.4);';
+    ov.appendChild(img);
+    ov.addEventListener('click', function() { ov.style.display = 'none'; });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') ov.style.display = 'none'; });
+    document.body.appendChild(ov);
+    sharedOverlay = ov;
+    return ov;
+  }
+  function openOverlay(url) {
+    var ov = getOverlay();
+    ov.querySelector('img').src = url;
+    ov.style.display = 'flex';
+  }
+
+  if (!customElements.get('photo-cube')) {
+    customElements.define('photo-cube', class extends HTMLElement {
+      connectedCallback() {
+        var self = this;
+        self._size = parseInt(self.getAttribute('size')) || 300;
+        self._speed = parseFloat(self.getAttribute('speed')) || 1;
+        self._faceUrls = {};
+        FACES.forEach(function(f) { var v = self.getAttribute(f.name); if (v) self._faceUrls[f.name] = v; });
+
+        var size = self._size, half = size / 2, speed = self._speed;
+        var BASE = 0.15 / speed, faceUrls = self._faceUrls;
+
+        var style = document.createElement('style');
+        style.textContent =
+          '.pc-wrap{display:inline-block;text-align:center}' +
+          '.pc-hint{font-family:"Rajdhani",sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(176,176,176,0.5);margin-bottom:14px}' +
+          '.pc-scene{width:'+size+'px;height:'+size+'px;perspective:900px;margin:0 auto;cursor:grab;user-select:none;-webkit-user-select:none}' +
+          '.pc-scene:active{cursor:grabbing}' +
+          '.pc-cube{width:100%;height:100%;position:relative;transform-style:preserve-3d}' +
+          '.pc-face{position:absolute;width:'+size+'px;height:'+size+'px;background-size:cover;background-position:center;border:2px solid rgba(106,0,255,0.4);box-shadow:inset 0 0 20px rgba(0,0,0,0.3);cursor:pointer;transition:box-shadow 0.2s;background-color:rgba(106,0,255,0.08)}' +
+          '.pc-face:hover{box-shadow:inset 0 0 0 3px rgba(0,240,255,0.7),0 0 30px rgba(0,240,255,0.3)}';
+        self.appendChild(style);
+
+        var wrap = document.createElement('div'); wrap.className = 'pc-wrap';
+        var hint = document.createElement('div'); hint.className = 'pc-hint';
+        hint.textContent = 'Drag to spin  ·  Click to expand';
+        var scene = document.createElement('div'); scene.className = 'pc-scene';
+        var cube = document.createElement('div'); cube.className = 'pc-cube';
+
+        FACES.forEach(function(f) {
+          var el = document.createElement('div');
+          el.className = 'pc-face';
+          el.style.transform = f.css.replace(/\{h\}/g, half);
+          if (faceUrls[f.name]) el.style.backgroundImage = 'url(' + faceUrls[f.name] + ')';
+          cube.appendChild(el);
+        });
+
+        scene.appendChild(cube); wrap.appendChild(hint); wrap.appendChild(scene); self.appendChild(wrap);
+
+        var rotX = -20, rotY = 0, velX = 0, velY = BASE;
+        var dragging = false, dragged = false, startX, startY, lastX, lastY;
+
+        (function loop() {
+          if (!dragging) {
+            velY += (BASE - velY) * 0.03;
+            velX += (0 - velX) * 0.03;
+            rotY += velY; rotX += velX;
+          }
+          cube.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
+          requestAnimationFrame(loop);
+        })();
+
+        scene.addEventListener('mousedown', function(e) { dragging = true; dragged = false; velX = 0; velY = 0; startX = lastX = e.clientX; startY = lastY = e.clientY; });
+        window.addEventListener('mousemove', function(e) {
+          if (!dragging) return;
+          var dx = e.clientX - lastX, dy = e.clientY - lastY;
+          if (Math.sqrt((e.clientX-startX)*(e.clientX-startX)+(e.clientY-startY)*(e.clientY-startY)) > 8) dragged = true;
+          rotY += dx * 0.4; rotX += dy * 0.4; velY = dx * 0.4; velX = dy * 0.4;
+          lastX = e.clientX; lastY = e.clientY;
+        });
+        window.addEventListener('mouseup', function() { dragging = false; });
+
+        scene.addEventListener('touchstart', function(e) { dragging = true; dragged = false; velX = 0; velY = 0; startX = lastX = e.touches[0].clientX; startY = lastY = e.touches[0].clientY; }, { passive: true });
+        scene.addEventListener('touchmove', function(e) {
+          if (!dragging) return;
+          var dx = e.touches[0].clientX - lastX, dy = e.touches[0].clientY - lastY;
+          if (Math.sqrt((e.touches[0].clientX-startX)*(e.touches[0].clientX-startX)+(e.touches[0].clientY-startY)*(e.touches[0].clientY-startY)) > 8) dragged = true;
+          rotY += dx * 0.4; rotX += dy * 0.4; velY = dx * 0.4; velX = dy * 0.4;
+          lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; e.preventDefault();
+        }, { passive: false });
+        scene.addEventListener('touchend', function() { dragging = false; });
+
+        scene.addEventListener('click', function() {
+          if (dragged) return;
+          var url = frontFace(rotX, rotY, faceUrls);
+          if (url) openOverlay(url);
+        });
+      }
+    });
+  }
+})();
+</script>
+
+<section style="padding:40px 24px 60px;text-align:center;position:relative;z-index:10">
+  <div class="container">
+    <div class="section-label spark-reveal">🔮 Preview the Art</div>
+    <h2 class="section-title spark-reveal delay-1" style="text-align:center;margin-bottom:8px">Spin the Cube</h2>
+    <p class="section-sub spark-reveal delay-2" style="text-align:center;margin:0 auto 32px">Every face shows a different aurora forest render. Drag to spin. Click to expand.</p>
+    <div class="spark-reveal delay-3">
+      <photo-cube
+        size="320"
+        speed="1"
+        front=""
+        back=""
+        left=""
+        right=""
+        top=""
+        bottom=""
+      ></photo-cube>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GALLERY PREVIEW STRIP ═══ -->
+<section style="padding:20px 24px 80px">
+  <div class="container">
+    <div class="section-label spark-reveal">🖼️ Sample Renders</div>
+    <h2 class="section-title spark-reveal delay-1">What This Generator Creates</h2>
+    <p class="section-sub spark-reveal delay-2">These images were generated using prompts from the Aurora Forest Generator. Every result is unique. Every result is yours.</p>
+    <div class="gallery-strip spark-reveal delay-3">
+      <div class="gallery-strip-item">🌲</div>
+      <div class="gallery-strip-item">🌌</div>
+      <div class="gallery-strip-item">🦌</div>
+      <div class="gallery-strip-item">✨</div>
+      <div class="gallery-strip-item">🌿</div>
+      <div class="gallery-strip-item">🏔️</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ WHAT YOU GET ═══ -->
+<section>
+  <div class="container">
+    <div class="section-label spark-reveal">⚡ What You Get</div>
+    <h2 class="section-title spark-reveal delay-1">Everything Inside the Generator</h2>
+    <p class="section-sub spark-reveal delay-2">One HTML file. Unlimited aurora forest prompts. No subscriptions, no logins, no prompt engineering degree required.</p>
+
+    <div class="features-grid">
+      <div class="feature-card spark-reveal">
+        <span class="feature-icon">🎨</span>
+        <div class="feature-title">Instant AI Art Prompts</div>
+        <div class="feature-desc">Generate detailed, render-ready prompts for aurora forest scenes. Enchanted woodlands, glowing canopies, northern lights weaving through ancient trees — one click, infinite variations.</div>
+      </div>
+      <div class="feature-card spark-reveal delay-1">
+        <span class="feature-icon">🖥️</span>
+        <div class="feature-title">Standalone HTML File</div>
+        <div class="feature-desc">No app to install. No account to create. Double-click the file, open it in any browser, and start generating. Works offline. Works forever.</div>
+      </div>
+      <div class="feature-card spark-reveal delay-2">
+        <span class="feature-icon">🔄</span>
+        <div class="feature-title">Unlimited Generations</div>
+        <div class="feature-desc">No token limits. No monthly caps. Generate as many aurora forest prompts as you want — today, tomorrow, in five years. One purchase, unlimited output.</div>
+      </div>
+      <div class="feature-card spark-reveal delay-3">
+        <span class="feature-icon">🏷️</span>
+        <div class="feature-title">Commercial Use Ready</div>
+        <div class="feature-desc">Use the generated prompts and resulting art for your products, content, prints, merch — whatever you build. No attribution required. It's yours.</div>
+      </div>
+      <div class="feature-card spark-reveal delay-4">
+        <span class="feature-icon">🎯</span>
+        <div class="feature-title">Platform Agnostic</div>
+        <div class="feature-desc">Works with Midjourney, DALL-E, Stable Diffusion, Leonardo AI, or any image generation platform. The prompts adapt to whatever tool you use.</div>
+      </div>
+      <div class="feature-card spark-reveal delay-1">
+        <span class="feature-icon">⚡</span>
+        <div class="feature-title">Zero Learning Curve</div>
+        <div class="feature-desc">If you can click a button, you can use this. The generator handles the prompt engineering — you handle the creating. That's how it should be.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section id="how-it-works" style="background:linear-gradient(180deg,transparent,rgba(106,0,255,0.04),transparent)">
+  <div class="container">
+    <div class="section-label spark-reveal">🔧 How It Works</div>
+    <h2 class="section-title spark-reveal delay-1">Three Steps. That's It.</h2>
+    <p class="section-sub spark-reveal delay-2">No setup wizards. No onboarding flows. No YouTube tutorial required.</p>
+
+    <div class="steps-grid spark-reveal delay-3">
+      <div class="step-card">
+        <div class="step-title">Download & Open</div>
+        <div class="step-desc">Purchase the generator and download the HTML file. Open it in any browser — Chrome, Firefox, Safari, Edge. Done.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">Click Generate</div>
+        <div class="step-desc">Hit the generate button. The tool builds a detailed, optimised aurora forest prompt with randomised elements for unique results every time.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-title">Render Your Art</div>
+        <div class="step-desc">Copy the prompt into your AI art platform of choice. Paste, generate, and watch an enchanted aurora forest materialise on screen.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PAIN vs SOLUTION ═══ -->
+<section>
+  <div class="container">
+    <div class="section-label spark-reveal">💡 Why This Exists</div>
+    <h2 class="section-title spark-reveal delay-1">Stop Overcomplicating Creativity</h2>
+    <p class="section-sub spark-reveal delay-2">You have ideas but the tools keep getting in the way. Sound familiar?</p>
+
+    <div class="pain-grid spark-reveal delay-3">
+      <div class="pain-col">
+        <h3>Without the Generator</h3>
+        <ul class="pain-list">
+          <li>Spending 30+ minutes tweaking prompts that still don't work</li>
+          <li>Getting inconsistent, unpredictable AI art results</li>
+          <li>Paying monthly for tools you barely use</li>
+          <li>Feeling like everyone else has cracked the code except you</li>
+          <li>Copy-pasting "aurora forest" into AI and hoping for the best</li>
+        </ul>
+      </div>
+      <div class="solution-col">
+        <h3>With the Generator</h3>
+        <ul class="solution-list">
+          <li>One click = a perfectly structured, detailed prompt</li>
+          <li>Consistent, high-quality results every single time</li>
+          <li>One payment. No subscriptions. No expiry.</li>
+          <li>You're not guessing — the system handles the engineering</li>
+          <li>Unique variations on every generate — never the same twice</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SOCIAL PROOF ═══ -->
+<section style="background:linear-gradient(180deg,transparent,rgba(0,240,255,0.03),transparent)">
+  <div class="container">
+    <div class="section-label spark-reveal">⭐ What Creators Say</div>
+    <h2 class="section-title spark-reveal delay-1">Real Results. Real People.</h2>
+    <p class="section-sub spark-reveal delay-2">From Etsy sellers to content creators — the generators speak for themselves.</p>
+
+    <div class="testimonials-grid spark-reveal delay-3">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"I was spending hours trying to get the right aurora look in Midjourney. This generator nailed it on the first try. I've already made three print designs from it."</div>
+        <div class="testimonial-author">— Digital Product Seller, Etsy</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"The prompts are incredibly detailed. I didn't even know you could describe forest scenes like that. My art has levelled up and I'm not a designer at all."</div>
+        <div class="testimonial-author">— Content Creator, TikTok</div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <div class="testimonial-text">"No subscription. No login. I just open the file and go. This is how every creative tool should work. Already bought two more generators from RealmRender."</div>
+        <div class="testimonial-author">— AI Art Hobbyist</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ═══ -->
+<section>
+  <div class="container">
+    <div class="section-label spark-reveal">❓ Questions</div>
+    <h2 class="section-title spark-reveal delay-1">Frequently Asked</h2>
+    <p class="section-sub spark-reveal delay-2">Everything you need to know before you buy.</p>
+
+    <div class="faq-list spark-reveal delay-3">
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open');var a=this.nextElementSibling;a.style.maxHeight=a.style.maxHeight?null:a.scrollHeight+'px'">
+          What exactly do I get? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">A single HTML file — the Aurora Forest Generator. Open it in any browser, click Generate, and get detailed AI art prompts designed to produce stunning aurora forest imagery in any AI art platform.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open');var a=this.nextElementSibling;a.style.maxHeight=a.style.maxHeight?null:a.scrollHeight+'px'">
+          Does it work with Midjourney / DALL-E / Stable Diffusion? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Yes. The prompts are platform-agnostic — they work with any AI image generation tool. Midjourney, DALL-E, Leonardo AI, Stable Diffusion, Flux, you name it.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open');var a=this.nextElementSibling;a.style.maxHeight=a.style.maxHeight?null:a.scrollHeight+'px'">
+          Is this a subscription? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">No. One-time purchase. The file is yours forever. No monthly fees, no token limits, no account required. Download it, use it indefinitely.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open');var a=this.nextElementSibling;a.style.maxHeight=a.style.maxHeight?null:a.scrollHeight+'px'">
+          Can I use the art commercially? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">The generator is yours to use commercially — create prompts and use the resulting art for prints, merch, digital products, content, whatever you want. No attribution needed.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open');var a=this.nextElementSibling;a.style.maxHeight=a.style.maxHeight?null:a.scrollHeight+'px'">
+          Do I need to know prompt engineering? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Not at all. That's the entire point. The generator handles all the prompt structure, detail, and optimisation. You just click a button and copy the result.</div></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="this.parentElement.classList.toggle('open');var a=this.nextElementSibling;a.style.maxHeight=a.style.maxHeight?null:a.scrollHeight+'px'">
+          Does it work offline? <span class="arrow">▼</span>
+        </button>
+        <div class="faq-a"><div class="faq-a-inner">Yes. It's a standalone HTML file — no internet connection required to generate prompts. You only need internet when you paste the prompt into your AI art platform.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FINAL CTA ═══ -->
+<section class="final-cta">
+  <div class="container" style="text-align:center">
+    <div class="section-label spark-reveal">🌲 Ready to Render?</div>
+    <h2 class="section-title spark-reveal delay-1">Stop Guessing. Start Generating.</h2>
+    <p class="section-sub spark-reveal delay-2">One file. Unlimited aurora forest prompts. No subscriptions. No complexity. Just results.</p>
+    <div class="spark-reveal delay-3">
+      <a href="#" class="spark-btn btn-primary" id="final-buy-btn">🛒 Get the Aurora Forest Generator</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SPARK STICKY CTA ═══ -->
+<div class="sticky-cta" id="sticky-cta">
+  <span class="sticky-cta-text">Aurora Forest Generator — Render Your Reality</span>
+  <a href="#" class="spark-btn btn-primary" id="sticky-buy-btn">🛒 Get It Now</a>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <img src="https://assets.cdn.filesafe.space/1zBBbC1hHp2VHtW9tU6S/media/6a129ffab3e0c02fe7da4d6f.png" alt="RealmRender">
+      <p>RealmRender — A digital creation engine for modern creators. No subscriptions. No friction. Render it. Use it. Sell it.</p>
+    </div>
+    <div class="footer-col"><h4>Create</h4><ul>
+      <li><a href="products.html">All Products</a></li><li><a href="bundles.html">Bundles</a></li>
+      <li><a href="programs.html">Programs</a></li><li><a href="free.html">Free Stuff</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Explore</h4><ul>
+      <li><a href="gallery.html">Art Gallery</a></li><li><a href="blog.html">Blog</a></li>
+      <li><a href="about.html">About</a></li><li><a href="contact.html">Contact</a></li>
+    </ul></div>
+    <div class="footer-col"><h4>Contact</h4><ul>
+      <li><a href="mailto:support@realmrenders.com.au">support@realmrenders.com.au</a></li>
+    </ul></div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2025 RealmRender. All rights reserved.</p>
+    <p><a href="privacy.html">Privacy Policy</a></p>
+  </div>
+</footer>
+
+<div class="spark-toast-container" id="toast-container"></div>
+
+<script>
+// ═══ CURSOR ═══
+var cursor = document.getElementById('cursor');
+var ring = document.getElementById('cursor-ring');
+document.addEventListener('mousemove', function(e) {
+  cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+  ring.style.left = e.clientX + 'px'; ring.style.top = e.clientY + 'px';
+});
+function cursorBig() { cursor.style.transform='translate(-50%,-50%) scale(1.8)'; ring.style.width='54px'; ring.style.height='54px'; ring.style.borderColor='var(--cyan)'; }
+function cursorNormal() { cursor.style.transform='translate(-50%,-50%) scale(1)'; ring.style.width='36px'; ring.style.height='36px'; ring.style.borderColor='var(--arcane)'; }
+document.querySelectorAll('a,button').forEach(function(el) { el.addEventListener('mouseenter',cursorBig); el.addEventListener('mouseleave',cursorNormal); });
+
+// ═══ CANVAS BACKGROUND ═══
+(function() {
+  var canvas = document.getElementById('portal-canvas'), ctx = canvas.getContext('2d');
+  var particles = [], W, H;
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  for (var i = 0; i < 100; i++) particles.push({
+    x:Math.random()*window.innerWidth, y:Math.random()*window.innerHeight,
+    r:Math.random()*2+0.5, vx:(Math.random()-0.5)*0.35, vy:(Math.random()-0.5)*0.35,
+    life:Math.random(), hue:Math.random()>0.5?140:Math.random()>0.5?186:270
+  });
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    var grad = ctx.createRadialGradient(W*0.5,H*0.3,0,W*0.5,H*0.3,Math.min(W,H)*0.55);
+    grad.addColorStop(0,'rgba(34,197,94,0.05)'); grad.addColorStop(0.5,'rgba(106,0,255,0.04)'); grad.addColorStop(1,'transparent');
+    ctx.fillStyle = grad; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(34,197,94,0.025)'; ctx.lineWidth=1;
+    for(var x=0;x<W;x+=80){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+    for(var y=0;y<H;y+=80){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+    particles.forEach(function(p){
+      p.x+=p.vx;p.y+=p.vy;p.life+=0.004;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      var alpha=0.25+0.4*Math.sin(p.life*Math.PI);
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='hsla('+p.hue+',100%,70%,'+alpha+')';ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══ MOBILE NAV ═══
+document.getElementById('burger').addEventListener('click', function() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+});
+
+// ═══ SPARK REVEAL ═══
+var revealObs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if(e.isIntersecting){e.target.classList.add('revealed');revealObs.unobserve(e.target);} });
+}, { threshold: 0.12 });
+document.querySelectorAll('.spark-reveal').forEach(function(r) { revealObs.observe(r); });
+
+// ═══ STICKY CTA ═══
+var stickyCta = document.getElementById('sticky-cta');
+window.addEventListener('scroll', function() {
+  stickyCta.classList.toggle('visible', window.scrollY > 600);
+});
+
+// ═══ TOAST ═══
+function showToast(icon, msg, dur) {
+  var c = document.getElementById('toast-container');
+  var t = document.createElement('div'); t.className='spark-toast';
+  t.innerHTML='<span>'+icon+'</span><span>'+msg+'</span>';
+  c.appendChild(t);
+  setTimeout(function(){t.classList.add('out');setTimeout(function(){t.remove();},400);}, dur||3800);
+}
+setTimeout(function(){ showToast('🌲','Welcome to the Aurora Forest Generator. Scroll to explore.', 5000); }, 2000);
+
+// ═══ VIEW TRANSITIONS ═══
+function sparkNavigate(url) {
+  if (!document.startViewTransition) { window.location.href = url; return; }
+  document.startViewTransition(function() { window.location.href = url; });
+}
+document.querySelectorAll('a[href$=".html"]').forEach(function(link) {
+  if (link.getAttribute('target') === '_blank') return;
+  link.addEventListener('click', function(e) { e.preventDefault(); sparkNavigate(link.href); });
+});
+</script>
+
+<!-- ═══ SPARK SCHEMA ═══ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "Aurora Forest Generator",
+  "description": "Standalone HTML generator that creates detailed AI art prompts for aurora forest imagery. One-time purchase, unlimited generations, commercial use ready.",
+  "image": "",
+  "brand": {
+    "@type": "Organization",
+    "name": "RealmRender",
+    "url": "https://realmrenders.com.au"
+  },
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "USD",
+    "availability": "https://schema.org/InStock"
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Rabbit Hole — Where Side Hustles Become Success Stories.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;600&family=Montserrat:wght@800;900&family=Poppins:wght@600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --midnight: #020033;
+  --midnight-light: #07004a;
+  --midnight-card: #0a0044;
+  --cosmic: #5C35C8;
+  --cosmic-dim: rgba(92,53,200,0.15);
+  --cosmic-glow: rgba(92,53,200,0.4);
+  --teal: #27D8C6;
+  --teal-dim: rgba(39,216,198,0.12);
+  --teal-glow: rgba(39,216,198,0.35);
+  --violet: #D947FF;
+  --pink: #FF58E8;
+  --gold: #E5D38C;
+  --ash: #B0B0C0;
+  --moonlight: #F7F7FA;
+  --muted: #7778a0;
+  --line: rgba(92,53,200,0.22);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100vh; background: var(--midnight); color: var(--moonlight); font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; }
+
+/* ── BG CANVAS ── */
+#bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(50% 40% at 50% 30%, rgba(92,53,200,0.1), transparent 60%),
+              radial-gradient(40% 35% at 80% 60%, rgba(39,216,198,0.06), transparent 55%),
+              linear-gradient(180deg, rgba(2,0,51,0.3), rgba(2,0,51,0.95)); }
+
+/* ── TOPBAR ── */
+.topbar { position: relative; z-index: 10; text-align: center; padding: 36px 20px 4px; }
+.topbar .eyebrow { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 5px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; opacity: 0.85; }
+.topbar h1 { font-family: 'Montserrat', sans-serif; font-size: 38px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase;
+  background: linear-gradient(90deg, var(--gold), var(--teal), var(--violet), var(--gold));
+  background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: brandPulse 10s ease-in-out infinite; }
+@keyframes brandPulse { 0%,100% { background-position: 0% } 50% { background-position: 300% } }
+.topbar .tagline { font-family: 'Poppins', sans-serif; color: var(--ash); font-size: 12px; letter-spacing: 2px; margin-top: 8px; font-style: italic; }
+
+/* ── NAV ── */
+.nav-bar { position: relative; z-index: 10; display: flex; justify-content: center; gap: 8px; padding: 16px 20px; flex-wrap: wrap; }
+.nav-btn { font-family: 'Poppins', sans-serif; padding: 9px 20px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+  border: 1px solid var(--line); border-radius: 30px; background: transparent; color: var(--muted); cursor: pointer; transition: .2s; }
+.nav-btn:hover, .nav-btn.active { color: var(--midnight); background: linear-gradient(135deg, var(--cosmic), var(--teal));
+  border-color: transparent; box-shadow: 0 0 20px var(--cosmic-glow); }
+
+/* ── PRODUCT GRID ── */
+.store-section { position: relative; z-index: 10; max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
+.section-title { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 18px; }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+/* ── PRODUCT CARD ── */
+.product-card { background: var(--midnight-card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+  cursor: pointer; transition: .25s; position: relative; }
+.product-card:hover { transform: translateY(-4px); border-color: var(--cosmic); box-shadow: 0 12px 40px rgba(92,53,200,0.28); }
+.card-image { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: #060028; }
+.card-image-placeholder { width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #060028, #120050); font-size: 48px; }
+.card-body { padding: 14px 16px 16px; }
+.card-title { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.card-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.card-price { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 900;
+  background: linear-gradient(90deg, var(--gold), var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.card-price.free { background: linear-gradient(90deg, #00ff88, var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag { font-family: 'Poppins', sans-serif; font-size: 9px; padding: 3px 8px; border-radius: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.tag-featured { background: var(--cosmic-dim); color: var(--violet); border: 1px solid rgba(217,71,255,0.3); }
+.tag-premium { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(39,216,198,0.3); }
+.tag-new { background: rgba(229,211,140,0.12); color: var(--gold); border: 1px solid rgba(229,211,140,0.3); }
+
+/* ── FAVORITE BUTTON ── */
+.card-fav { position: absolute; top: 10px; right: 10px; z-index: 5; width: 32px; height: 32px; border-radius: 50%;
+  border: none; background: rgba(2,0,51,0.7); backdrop-filter: blur(6px); color: var(--muted);
+  font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .2s; }
+.card-fav:hover { background: rgba(92,53,200,0.4); color: #fff; }
+.card-fav.active { color: var(--violet); background: rgba(217,71,255,0.2); }
+
+/* ── LOCKED OVERLAY ── */
+.card-locked { position: absolute; inset: 0; background: rgba(2,0,51,0.88); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px; border-radius: 16px; opacity: 0; transition: .25s; }
+.product-card:hover .card-locked { opacity: 1; }
+.card-locked .lock-icon { font-size: 36px; }
+.card-locked .lock-label { font-family: 'Poppins', sans-serif; font-size: 13px; font-weight: 600; color: var(--gold); letter-spacing: 1px; }
+.btn-buy { font-family: 'Poppins', sans-serif; padding: 10px 28px; border: none; border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--cosmic), var(--teal)); color: var(--midnight); cursor: pointer; transition: .2s; }
+.btn-buy:hover { box-shadow: 0 0 24px var(--teal-glow); transform: scale(1.05); }
+
+/* ── IFRAME OVERLAY ── */
+.iframe-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,10,0.94); }
+.iframe-overlay.open { display: flex; flex-direction: column; }
+.iframe-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;
+  background: var(--midnight-light); border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.iframe-title { font-family: 'Montserrat', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--gold), var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.iframe-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: transparent;
+  color: var(--moonlight); font-size: 18px; cursor: pointer; transition: .2s; display: flex; align-items: center; justify-content: center; }
+.iframe-close:hover { background: var(--pink); border-color: var(--pink); color: #fff; }
+.iframe-container { flex: 1; }
+.iframe-container iframe { width: 100%; height: 100%; border: none; background: var(--midnight); }
+
+/* ── LOADING ── */
+.loading-state { text-align: center; padding: 80px 20px; }
+.loading-spinner { width: 40px; height: 40px; border: 3px solid var(--line); border-top-color: var(--cosmic);
+  border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg) } }
+.loading-text { font-family: 'Cinzel', serif; color: var(--muted); font-size: 13px; letter-spacing: 3px; }
+
+/* ── EMAIL LOGIN BAR ── */
+.login-bar { position: relative; z-index: 10; display: flex; justify-content: center; gap: 8px; padding: 0 20px 12px; }
+.login-bar input { font-family: 'Inter', sans-serif; padding: 9px 16px; font-size: 13px; border-radius: 30px; border: 1px solid var(--line);
+  background: var(--midnight-card); color: var(--moonlight); width: 280px; text-align: center; }
+.login-bar input:focus { outline: none; border-color: var(--cosmic); box-shadow: 0 0 0 3px var(--cosmic-dim); }
+.login-bar button { font-family: 'Poppins', sans-serif; padding: 9px 20px; font-size: 12px; font-weight: 600; border-radius: 30px; border: none;
+  background: linear-gradient(135deg, var(--cosmic), var(--teal)); color: var(--midnight); cursor: pointer; transition: .2s; }
+.login-bar button:hover { box-shadow: 0 0 20px var(--teal-glow); }
+.login-bar .logout-btn { background: rgba(255,255,255,0.06); color: var(--moonlight); border: 1px solid var(--line); }
+.login-bar .user-email { color: var(--gold); font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; padding: 9px 0; letter-spacing: .5px; }
+
+/* ── MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 900; background: rgba(0,0,20,0.9);
+  align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--midnight-card); border: 1px solid var(--line); border-radius: 18px; padding: 32px;
+  width: 90%; max-width: 420px; text-align: center; }
+.modal-box h2 { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--gold), var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.modal-box p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+.modal-input { font-family: 'Inter', sans-serif; width: 100%; padding: 12px 16px; font-size: 14px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--midnight); color: var(--moonlight); text-align: center; font-weight: 700; }
+.modal-input:focus { outline: none; border-color: var(--cosmic); box-shadow: 0 0 0 3px var(--cosmic-dim); }
+.modal-input.error { border-color: var(--pink); box-shadow: 0 0 0 3px rgba(255,88,232,0.2); }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+.modal-actions button { font-family: 'Poppins', sans-serif; flex: 1; padding: 11px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+.modal-submit { background: linear-gradient(135deg, var(--cosmic), var(--teal)); color: var(--midnight); }
+.modal-cancel { background: rgba(255,255,255,0.06); color: var(--moonlight); border: 1px solid var(--line) !important; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 1100;
+  font-family: 'Poppins', sans-serif; padding: 12px 28px; border-radius: 30px; font-size: 13px; font-weight: 700; color: var(--midnight);
+  background: linear-gradient(135deg, var(--gold), var(--teal)); box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+  opacity: 0; pointer-events: none; transition: .3s; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── BUNDLE PICKER ── */
+.bundle-picker { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,10,0.93);
+  align-items: center; justify-content: center; }
+.bundle-picker.open { display: flex; }
+.bundle-picker-box { background: var(--midnight-card); border: 1px solid var(--line); border-radius: 18px;
+  padding: 28px; width: 90%; max-width: 520px; }
+.bundle-picker-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.bundle-picker-title { font-family: 'Montserrat', sans-serif; font-size: 18px; font-weight: 900; letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--gold), var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.bundle-picker-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line);
+  background: transparent; color: var(--moonlight); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.bundle-picker-close:hover { background: var(--violet); border-color: var(--violet); }
+.bundle-picker-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; font-family: 'Inter', sans-serif; }
+.bundle-item { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px;
+  background: rgba(255,255,255,0.02); }
+.bundle-item-title { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: var(--moonlight); }
+.bundle-item-desc { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'Inter', sans-serif; }
+.btn-launch { padding: 8px 20px; border: none; border-radius: 30px; font-size: 11px; font-weight: 700;
+  font-family: 'Poppins', sans-serif; letter-spacing: 1px;
+  background: linear-gradient(135deg, var(--cosmic), var(--teal));
+  color: var(--moonlight); cursor: pointer; white-space: nowrap; transition: .2s; }
+.btn-launch:hover { box-shadow: 0 0 18px var(--teal-glow); transform: scale(1.04); }
+.bundle-item-locked { opacity: 0.4; }
+
+/* ── SHOWCASE CUBE ── */
+.showcase-section { position: relative; z-index: 10; text-align: center; padding: 10px 20px 36px; }
+.showcase-label { font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--teal); margin-bottom: 6px; }
+.showcase-title { font-family: 'Montserrat', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px;
+  background: linear-gradient(135deg, var(--gold), var(--teal)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.showcase-sub { font-size: 11px; color: var(--muted); margin-bottom: 20px; letter-spacing: .5px; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .topbar h1 { font-size: 24px; letter-spacing: 2px; }
+  .product-grid { grid-template-columns: 1fr; }
+  .store-section { padding: 16px 14px 40px; }
+}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="bg-vignette"></div>
+
+<div class="topbar">
+  <p class="eyebrow">&#127748; Powered by OnBrandly</p>
+  <h1>The Rabbit Hole</h1>
+  <p class="tagline">Where Side Hustles Become Success Stories.</p>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn active" onclick="filterCategory('all')">All</button>
+  <button class="nav-btn" onclick="filterCategory('generators')">Generators</button>
+  <button class="nav-btn" onclick="filterCategory('art-packs')">Art Packs</button>
+  <button class="nav-btn" onclick="filterCategory('music')">Music</button>
+  <button class="nav-btn" onclick="filterCategory('bundles')">Bundles</button>
+  <button class="nav-btn" onclick="filterCategory('favorites')">&#9825; Favorites</button>
+  <button class="nav-btn" onclick="filterCategory('library')">&#128218; My Library</button>
+  <button class="nav-btn" onclick="refreshStore()" style="margin-left:auto;border-color:rgba(39,216,198,0.3);">&#x21bb; Refresh</button>
+</div>
+
+<div id="loginBar" class="login-bar"></div>
+
+<div class="showcase-section" id="showcaseSection" style="display:none;">
+  <p class="showcase-label">Sample Outputs</p>
+  <h2 class="showcase-title">See What Gets Created</h2>
+  <p class="showcase-sub">Drag to spin · Click to expand</p>
+  <div style="display:flex;gap:100px;justify-content:center;flex-wrap:wrap;align-items:center;">
+    <photo-cube id="cube1" size="260" front="YOUR_PHOTO_URL_HERE" back="YOUR_PHOTO_URL_HERE" left="YOUR_PHOTO_URL_HERE" right="YOUR_PHOTO_URL_HERE" top="YOUR_PHOTO_URL_HERE" bottom="YOUR_PHOTO_URL_HERE"></photo-cube>
+    <photo-cube id="cube2" size="260" front="YOUR_PHOTO_URL_HERE" back="YOUR_PHOTO_URL_HERE" left="YOUR_PHOTO_URL_HERE" right="YOUR_PHOTO_URL_HERE" top="YOUR_PHOTO_URL_HERE" bottom="YOUR_PHOTO_URL_HERE"></photo-cube>
+  </div>
+</div>
+
+<div class="store-section">
+  <div id="featuredSection" style="display:none;">
+    <p class="section-title">&#10024; Featured Rabbit Holes</p>
+    <div id="featuredGrid" class="product-grid"></div>
+  </div>
+  <div style="margin-top:28px;">
+    <p class="section-title">&#128064; Explore All Rabbit Holes</p>
+    <div id="productGrid" class="product-grid"></div>
+  </div>
+  <div id="loadingState" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Exploring the Rabbit Hole...</p>
+  </div>
+</div>
+
+<!-- IFRAME OVERLAY -->
+<div id="iframeOverlay" class="iframe-overlay">
+  <div class="iframe-topbar">
+    <span id="iframeTitle" class="iframe-title"></span>
+    <button class="iframe-close" onclick="closeGenerator()">&times;</button>
+  </div>
+  <div class="iframe-container">
+    <iframe id="generatorFrame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" loading="lazy"></iframe>
+  </div>
+</div>
+
+<!-- BUNDLE PICKER MODAL -->
+<div id="bundlePicker" class="bundle-picker">
+  <div class="bundle-picker-box">
+    <div class="bundle-picker-header">
+      <span id="bundlePickerTitle" class="bundle-picker-title"></span>
+      <button class="bundle-picker-close" onclick="closeBundlePicker()">&times;</button>
+    </div>
+    <p id="bundlePickerSub" class="bundle-picker-sub"></p>
+    <div id="bundlePickerList"></div>
+  </div>
+</div>
+
+<!-- EMAIL LOGIN MODAL -->
+<div id="loginModal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Sign In</h2>
+    <p>Enter the email you used to purchase</p>
+    <input type="email" id="loginEmailInput" class="modal-input" placeholder="your@email.com" autocomplete="email">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeLoginModal()">Cancel</button>
+      <button class="modal-submit" onclick="submitLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   THE RABBIT HOLE STORE ENGINE
+   Reads products from a published Google Sheet
+   ═══════════════════════════════════════════════ */
+
+// ━━━ CONFIGURATION ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var _params = new URLSearchParams(window.location.search);
+var SHEET_ID = _params.get('sheetId') || '';
+var SHEET_NAME = 'Products';
+var APPS_SCRIPT_URL = _params.get('appsScriptUrl') || '';
+
+function getSheetURL() {
+  return 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_NAME + '&_t=' + Date.now();
+}
+
+// ━━━ STATE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var PRODUCTS = [];
+var UNLOCKED = {};
+var BUNDLES = {};
+var USER_EMAIL = localStorage.getItem('trh_email') || '';
+var currentFilter = 'all';
+var pendingProduct = null;
+var FAVORITES = JSON.parse(localStorage.getItem('trh_favorites') || '[]');
+
+// ━━━ LOAD FROM GOOGLE SHEET ━━━━━━━━━━━━━━━━━━
+function loadProducts() {
+  if (window.electronAPI && window.electronAPI.loadProducts) {
+    window.electronAPI.loadProducts().then(function(result) {
+      if (result.success && result.products && result.products.length > 0) {
+        PRODUCTS = result.products.map(function(p) {
+          var norm = {
+            id:           p.id || p.product_id || '',
+            title:        p.title || '',
+            description:  p.description || p.desc || '',
+            category:     (p.category || '').toLowerCase(),
+            price:        p.price || '',
+            image:        p.image || p.image_url || '',
+            generatorUrl: p.generatorUrl || p.generator_url || p.url || '',
+            featured:     p.featured === true || p.featured === 'true' || p.featured === '1' || p.featured === 1,
+            accessType:   (p.accessType || p.access_type || 'free').toLowerCase(),
+            purchaseUrl:  p.purchaseUrl || p.purchase_url || ''
+          };
+          var rawTags = p.tags || p.tag || '';
+          norm.tags = Array.isArray(rawTags)
+            ? rawTags
+            : String(rawTags).split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+          return norm;
+        });
+      } else {
+        PRODUCTS = getSampleProducts();
+      }
+      renderStore();
+    }).catch(function() {
+      PRODUCTS = getSampleProducts();
+      renderStore();
+    });
+    return;
+  }
+
+  // Browser fallback: direct gviz
+  if (SHEET_ID === 'YOUR_GOOGLE_SHEET_ID_HERE') {
+    PRODUCTS = getSampleProducts();
+    renderStore();
+    return;
+  }
+
+  var cbName = 'trhCallback_' + Date.now();
+  window[cbName] = function(resp) {
+    delete window[cbName];
+    try {
+      parseSheetData(resp);
+      renderStore();
+    } catch(e) {
+      console.error('Parse error:', e);
+      PRODUCTS = getSampleProducts();
+      renderStore();
+    }
+  };
+  var script = document.createElement('script');
+  script.src = getSheetURL() + '&tqx=responseHandler:' + cbName;
+  script.onerror = function() {
+    console.error('JSONP load failed, trying fetch...');
+    fetch(getSheetURL())
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        var json = JSON.parse(text.replace(/.*google\.visualization\.Query\.setResponse\(/, '').replace(/\);?\s*$/, ''));
+        parseSheetData(json);
+        renderStore();
+      })
+      .catch(function(err) {
+        console.error('Sheet load error:', err);
+        showToast('Could not load products — using demo data');
+        PRODUCTS = getSampleProducts();
+        renderStore();
+      });
+  };
+  document.body.appendChild(script);
+}
+
+function parseSheetData(json) {
+  var rows = json.table.rows;
+  PRODUCTS = [];
+
+  rows.forEach(function(row) {
+    var get = function(i) {
+      var cell = row.c[i];
+      return cell && cell.v != null ? String(cell.v) : '';
+    };
+
+    PRODUCTS.push({
+      id: get(0),
+      title: get(1),
+      description: get(2),
+      category: get(3).toLowerCase(),
+      price: get(4),
+      image: get(5),
+      generatorUrl: get(6),
+      tags: get(7).split(',').map(function(t) { return t.trim(); }).filter(Boolean),
+      featured: get(8).toLowerCase() === 'true' || get(8) === '1',
+      accessType: get(9).toLowerCase() || 'free',
+      purchaseUrl: get(10)
+    });
+  });
+}
+
+// ━━━ SAMPLE DATA ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function getSampleProducts() {
+  return [];
+}
+
+// ━━━ RENDER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderStore() {
+  document.getElementById('loadingState').style.display = 'none';
+
+  var featured = PRODUCTS.filter(function(p) { return p.featured; });
+  var filtered = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(function(p) { return p.category === currentFilter; });
+
+  if (currentFilter === 'favorites') {
+    filtered = PRODUCTS.filter(function(p) { return FAVORITES.indexOf(p.id) !== -1; });
+  } else if (currentFilter === 'library') {
+    filtered = PRODUCTS.filter(function(p) { return p.accessType === 'free' || UNLOCKED[p.id] || UNLOCKED['all']; });
+  }
+
+  var fs = document.getElementById('featuredSection');
+  var fg = document.getElementById('featuredGrid');
+  if (featured.length > 0 && currentFilter === 'all') {
+    fs.style.display = 'block';
+    fg.innerHTML = featured.map(buildCard).join('');
+  } else {
+    fs.style.display = 'none';
+  }
+
+  var emptyMsg = currentFilter === 'favorites'
+    ? 'No favorites yet — click the ♡ on any product to save it.'
+    : currentFilter === 'library'
+    ? 'Your library is empty — sign in or purchase a product to see it here.'
+    : 'No rabbit holes in this category yet.';
+
+  document.getElementById('productGrid').innerHTML = filtered.length
+    ? filtered.map(buildCard).join('')
+    : '<p style="color:var(--muted);font-size:13px;">' + emptyMsg + '</p>';
+}
+
+function buildCard(p) {
+  var isUnlocked = p.accessType === 'free' || UNLOCKED[p.id] || UNLOCKED['all'];
+  var priceClass = p.price === 'Free' || p.price === '0' || p.price === '' ? 'free' : '';
+  var displayPrice = p.price === 'Free' || p.price === '0' || p.price === '' ? 'Free' : p.price;
+
+  var imageHTML = p.image
+    ? '<img class="card-image" src="' + p.image + '" alt="' + p.title + '" loading="lazy">'
+    : '<div class="card-image-placeholder">&#127748;</div>';
+
+  var tagsHTML = p.tags.map(function(t) {
+    var cls = t === 'featured' ? 'tag-featured' : t === 'premium' ? 'tag-premium' : t === 'new' ? 'tag-new' : 'tag-featured';
+    return '<span class="tag ' + cls + '">' + t + '</span>';
+  }).join('');
+
+  var lockOverlay = '';
+  if (!isUnlocked && p.accessType === 'paid') {
+    var buyBtn = p.purchaseUrl
+      ? '<button class="btn-buy" onclick="event.stopPropagation();openPurchasePage(\'' + p.purchaseUrl + '\',\'' + p.title + '\')">Get Access</button>'
+      : '';
+    lockOverlay = '<div class="card-locked">' +
+      '<span class="lock-icon">&#128274;</span>' +
+      '<span class="lock-label">' + p.price + '</span>' +
+      buyBtn +
+      '</div>';
+  }
+
+  var isFav = FAVORITES.indexOf(p.id) !== -1;
+  var favBtn = '<button class="card-fav' + (isFav ? ' active' : '') + '" onclick="event.stopPropagation();toggleFavorite(\'' + p.id + '\')">' + (isFav ? '&#9829;' : '&#9825;') + '</button>';
+
+  return '<div class="product-card" onclick="handleCardClick(\'' + p.id + '\')">' +
+    favBtn +
+    imageHTML +
+    '<div class="card-body">' +
+      '<div class="card-title">' + p.title + '</div>' +
+      '<div class="card-desc">' + p.description + '</div>' +
+      '<div class="card-footer">' +
+        '<span class="card-price ' + priceClass + '">' + displayPrice + '</span>' +
+        '<div class="card-tags">' + tagsHTML + '</div>' +
+      '</div>' +
+    '</div>' +
+    lockOverlay +
+  '</div>';
+}
+
+// ━━━ FAVORITES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleFavorite(id) {
+  var idx = FAVORITES.indexOf(id);
+  if (idx === -1) { FAVORITES.push(id); } else { FAVORITES.splice(idx, 1); }
+  localStorage.setItem('trh_favorites', JSON.stringify(FAVORITES));
+  renderStore();
+}
+
+// ━━━ FILTERING ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function filterCategory(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  var btn = document.querySelector('[onclick="filterCategory(\'' + cat + '\')"]');
+  if (btn) btn.classList.add('active');
+  renderStore();
+}
+
+// ━━━ CARD CLICK → OPEN GENERATOR ━━━━━━━━━━━━
+function handleCardClick(id) {
+  var product = PRODUCTS.find(function(p) { return p.id === id; });
+  if (!product) return;
+
+  // Bundle handling — show picker
+  if (product.category === 'bundles') {
+    if (product.accessType === 'paid' && !UNLOCKED[id] && !UNLOCKED['all']) {
+      if (product.purchaseUrl) {
+        openPurchasePage(product.purchaseUrl, product.title);
+      } else {
+        showToast('Purchase this bundle to unlock all rabbit holes inside');
+      }
+      return;
+    }
+    var bundleProductIds = (product.generatorUrl || '').split(',').map(function(p) { return p.trim().toLowerCase(); }).filter(Boolean);
+    openBundlePicker(id, product.title, product.description, bundleProductIds, product.accessType);
+    return;
+  }
+
+  if (product.accessType === 'paid' && !UNLOCKED[id] && !UNLOCKED['all']) {
+    if (product.purchaseUrl) {
+      openPurchasePage(product.purchaseUrl, product.title);
+    } else if (!USER_EMAIL) {
+      pendingProduct = id;
+      openLoginModal();
+    } else {
+      showToast('You haven\'t purchased this rabbit hole yet');
+    }
+    return;
+  }
+
+  if (product.generatorUrl) {
+    openGenerator(product);
+  } else {
+    showToast('Generator URL not configured yet');
+  }
+}
+
+// ━━━ BUNDLE PICKER ━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openBundlePicker(bundleId, bundleTitle, bundleDesc, productIds, bundleAccessType) {
+  document.getElementById('bundlePickerTitle').textContent = bundleTitle;
+  document.getElementById('bundlePickerSub').textContent = bundleDesc || 'Choose a rabbit hole to open';
+  document.getElementById('bundlePicker').classList.add('open');
+
+  var list = document.getElementById('bundlePickerList');
+
+  if (!productIds || productIds.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:13px;">No rabbit holes configured. Add product IDs to the generator_url column for this bundle.</p>';
+    return;
+  }
+
+  list.innerHTML = productIds.map(function(pid) {
+    var product = PRODUCTS.find(function(p) { return p.id.toLowerCase() === pid; });
+    if (!product) return '<div class="bundle-item bundle-item-locked"><div><div class="bundle-item-title">' + pid + '</div><div class="bundle-item-desc">Product not found — check ID in Products sheet</div></div></div>';
+    var hasAccess = UNLOCKED[pid] || UNLOCKED[bundleId.toLowerCase()] || UNLOCKED['all'] || bundleAccessType === 'free' || product.accessType === 'free';
+    var lockedClass = hasAccess ? '' : ' bundle-item-locked';
+    var btn = hasAccess
+      ? '<button class="btn-launch" onclick="launchBundleItem(\'' + pid + '\')">Open</button>'
+      : '<button class="btn-launch" style="background:var(--muted);cursor:default" disabled>Locked</button>';
+    return '<div class="bundle-item' + lockedClass + '">' +
+      '<div><div class="bundle-item-title">' + product.title + '</div>' +
+      '<div class="bundle-item-desc">' + (product.description || '') + '</div></div>' +
+      btn + '</div>';
+  }).join('');
+}
+
+function closeBundlePicker() {
+  document.getElementById('bundlePicker').classList.remove('open');
+}
+
+function launchBundleItem(pid) {
+  var product = PRODUCTS.find(function(p) { return p.id.toLowerCase() === pid; });
+  if (product && product.generatorUrl) {
+    closeBundlePicker();
+    openGenerator(product);
+  } else {
+    showToast('URL not configured for this rabbit hole');
+  }
+}
+
+function openGenerator(product) {
+  var overlay = document.getElementById('iframeOverlay');
+  var frame = document.getElementById('generatorFrame');
+  document.getElementById('iframeTitle').textContent = product.title;
+  frame.src = product.generatorUrl;
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGenerator() {
+  var overlay = document.getElementById('iframeOverlay');
+  var frame = document.getElementById('generatorFrame');
+  overlay.classList.remove('open');
+  frame.src = '';
+  document.body.style.overflow = '';
+}
+
+// ━━━ PURCHASE PAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openPurchasePage(url, title) {
+  var overlay = document.getElementById('iframeOverlay');
+  var frame = document.getElementById('generatorFrame');
+  document.getElementById('iframeTitle').textContent = 'Get Access: ' + title;
+  frame.src = url;
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// ━━━ EMAIL LOGIN SYSTEM ━━━━━━━━━━━━━━━━━━━━━
+function renderLoginBar() {
+  var bar = document.getElementById('loginBar');
+  if (USER_EMAIL) {
+    bar.innerHTML = '<span class="user-email">Signed in as ' + USER_EMAIL + '</span>' +
+      '<button class="logout-btn" onclick="logout()">Sign Out</button>';
+  } else {
+    bar.innerHTML = '<input type="email" id="topEmailInput" placeholder="Enter your purchase email" autocomplete="email">' +
+      '<button onclick="loginFromBar()">Sign In</button>';
+  }
+}
+
+function openLoginModal() {
+  document.getElementById('loginEmailInput').value = '';
+  document.getElementById('loginEmailInput').classList.remove('error');
+  document.getElementById('loginModal').classList.add('open');
+  setTimeout(function() { document.getElementById('loginEmailInput').focus(); }, 100);
+}
+
+function closeLoginModal() {
+  document.getElementById('loginModal').classList.remove('open');
+  pendingProduct = null;
+}
+
+function loginFromBar() {
+  var input = document.getElementById('topEmailInput');
+  var email = input ? input.value.trim().toLowerCase() : '';
+  if (!email || email.indexOf('@') === -1) {
+    showToast('Enter a valid email');
+    return;
+  }
+  doLogin(email);
+}
+
+function submitLogin() {
+  var email = document.getElementById('loginEmailInput').value.trim().toLowerCase();
+  if (!email || email.indexOf('@') === -1) {
+    document.getElementById('loginEmailInput').classList.add('error');
+    return;
+  }
+  doLogin(email);
+}
+
+function doLogin(email) {
+  showToast('Checking access...');
+
+  var handler = window.electronAPI
+    ? window.electronAPI.checkAccess(email)
+    : fetch(APPS_SCRIPT_URL + '?action=check&email=' + encodeURIComponent(email) + '&sheetId=' + encodeURIComponent(SHEET_ID)).then(function(r) { return r.json(); });
+
+  handler.then(function(result) {
+      USER_EMAIL = email;
+      localStorage.setItem('trh_email', email);
+      UNLOCKED = {};
+
+      if (result.success && result.products) {
+        result.products.forEach(function(pid) { UNLOCKED[pid] = true; });
+        showToast('Welcome! ' + result.products.length + ' rabbit hole' + (result.products.length === 1 ? '' : 's') + ' unlocked');
+      } else {
+        showToast('Signed in — no purchases found yet');
+      }
+
+      closeLoginModal();
+      renderLoginBar();
+      renderStore();
+
+      if (pendingProduct && (UNLOCKED[pendingProduct] || UNLOCKED['all'])) {
+        var product = PRODUCTS.find(function(p) { return p.id === pendingProduct; });
+        if (product && product.generatorUrl) {
+          setTimeout(function() { openGenerator(product); }, 600);
+        }
+        pendingProduct = null;
+      }
+    })
+    .catch(function() {
+      showToast('Could not connect — try again');
+    });
+}
+
+function logout() {
+  USER_EMAIL = '';
+  UNLOCKED = {};
+  localStorage.removeItem('trh_email');
+  renderLoginBar();
+  renderStore();
+  showToast('Signed out');
+}
+
+// ━━━ KEYBOARD ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('iframeOverlay').classList.contains('open')) closeGenerator();
+    if (document.getElementById('loginModal').classList.contains('open')) closeLoginModal();
+    if (document.getElementById('bundlePicker').classList.contains('open')) closeBundlePicker();
+  }
+  if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('open')) submitLogin();
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'topEmailInput') loginFromBar();
+});
+
+// ━━━ REFRESH ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function refreshStore() {
+  showToast('Refreshing...');
+  loadProducts();
+  if (USER_EMAIL) { doLogin(USER_EMAIL); }
+}
+
+// ━━━ TOAST ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var toastTimer;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+// ━━━ BG ANIMATION (cosmic particles) ━━━━━━━━
+(function() {
+  var c = document.getElementById('bgCanvas'), x = c.getContext('2d'), W, H;
+  var motes = [];
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function resize() { W = c.width = innerWidth; H = c.height = innerHeight; init(); }
+  function init() {
+    motes = [];
+    var n = Math.max(20, Math.floor(W / 35));
+    for (var i = 0; i < n; i++) {
+      motes.push({
+        x: rnd(0, W), y: rnd(0, H), r: rnd(0.3, 1.4),
+        vy: rnd(-0.05, 0.03), vx: rnd(-0.03, 0.03),
+        tw: rnd(0, 6.28), ts: rnd(0.004, 0.014),
+        type: Math.random() < 0.4 ? 'cosmic' : Math.random() < 0.6 ? 'teal' : 'gold'
+      });
+    }
+  }
+  function frame() {
+    x.clearRect(0, 0, W, H);
+    var g = x.createRadialGradient(W / 2, H * 0.3, 0, W / 2, H * 0.3, Math.min(W, H) * 0.5);
+    g.addColorStop(0, 'hsla(252,60%,50%,0.05)');
+    g.addColorStop(1, 'transparent');
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    for (var i = 0; i < motes.length; i++) {
+      var m = motes[i];
+      m.y += m.vy; m.x += m.vx + Math.sin(m.tw) * 0.05; m.tw += m.ts;
+      if (m.y < -4) m.y = H + 4; if (m.y > H + 4) m.y = -4;
+      if (m.x < -4) m.x = W + 4; if (m.x > W + 4) m.x = -4;
+      var a = 0.15 + 0.45 * Math.abs(Math.sin(m.tw));
+      x.beginPath(); x.arc(m.x, m.y, m.r, 0, 6.28);
+      if (m.type === 'cosmic') {
+        x.shadowColor = 'rgba(92,53,200,0.5)'; x.fillStyle = 'rgba(92,53,200,' + (0.4 * a) + ')';
+      } else if (m.type === 'teal') {
+        x.shadowColor = 'rgba(39,216,198,0.5)'; x.fillStyle = 'rgba(39,216,198,' + (0.35 * a) + ')';
+      } else {
+        x.shadowColor = 'rgba(229,211,140,0.5)'; x.fillStyle = 'rgba(229,211,140,' + (0.3 * a) + ')';
+      }
+      x.shadowBlur = 6; x.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', resize);
+  resize(); frame();
+})();
+
+// ━━━ SETTINGS → CUBE PHOTOS ━━━━━━━━━━━━━━━━━
+function loadSettings() {
+  if (!APPS_SCRIPT_URL) return;
+  var url = APPS_SCRIPT_URL + '?action=getSettings' + (SHEET_ID ? '&sheetId=' + encodeURIComponent(SHEET_ID) : '');
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(result) { if (result.success && result.settings) applyCubePhotos(result.settings); })
+    .catch(function(e) { console.error('Settings load error:', e); });
+}
+
+function applyCubePhotos(settings) {
+  var faces = ['front','back','left','right','top','bottom'];
+  var anySection = false;
+  [['cube1','cube_'],['cube2','cube2_']].forEach(function(pair) {
+    var cube = document.getElementById(pair[0]);
+    if (!cube) return;
+    var hasAny = false;
+    faces.forEach(function(face) { var url = settings[pair[1] + face]; if (url) { cube.setAttribute(face, url); hasAny = true; } });
+    if (hasAny) { cube.innerHTML = ''; cube.connectedCallback(); anySection = true; }
+  });
+  if (anySection) { var sec = document.getElementById('showcaseSection'); if (sec) sec.style.display = ''; }
+}
+
+// ━━━ INIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+renderLoginBar();
+loadProducts();
+loadSettings();
+if (USER_EMAIL) { doLogin(USER_EMAIL); }
+</script>
+
+<script>
+(function () {
+  var FACES = [
+    { name: 'front',  css: 'translateZ({h}px)',                 normal: [ 0,  0,  1] },
+    { name: 'back',   css: 'rotateY(180deg) translateZ({h}px)', normal: [ 0,  0, -1] },
+    { name: 'left',   css: 'rotateY(-90deg) translateZ({h}px)', normal: [-1,  0,  0] },
+    { name: 'right',  css: 'rotateY(90deg) translateZ({h}px)',  normal: [ 1,  0,  0] },
+    { name: 'top',    css: 'rotateX(90deg) translateZ({h}px)',  normal: [ 0, -1,  0] },
+    { name: 'bottom', css: 'rotateX(-90deg) translateZ({h}px)', normal: [ 0,  1,  0] },
+  ];
+  function frontFace(rotX, rotY, faceUrls) {
+    var rx = rotX * Math.PI / 180, ry = rotY * Math.PI / 180;
+    var best = null, bestZ = -Infinity;
+    FACES.forEach(function(f) {
+      var nx=f.normal[0],ny=f.normal[1],nz=f.normal[2];
+      var nz2=-Math.sin(ry)*nx+Math.cos(ry)*nz;
+      var nz3=Math.sin(rx)*ny+Math.cos(rx)*nz2;
+      if (nz3 > bestZ) { bestZ = nz3; best = f.name; }
+    });
+    return (best && faceUrls[best]) ? faceUrls[best] : null;
+  }
+  var sharedOverlay = null;
+  function getOverlay() {
+    if (sharedOverlay) return sharedOverlay;
+    var ov = document.createElement('div');
+    ov.style.cssText = 'display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,10,0.94);align-items:center;justify-content:center;cursor:zoom-out;';
+    var img = document.createElement('img');
+    img.style.cssText = 'max-width:90vw;max-height:90vh;border-radius:12px;border:2px solid rgba(92,53,200,0.6);box-shadow:0 0 60px rgba(39,216,198,0.3);';
+    ov.appendChild(img);
+    ov.addEventListener('click', function() { ov.style.display = 'none'; });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') ov.style.display = 'none'; });
+    document.body.appendChild(ov);
+    sharedOverlay = ov;
+    return ov;
+  }
+  function openOverlay(url) { var ov=getOverlay(); ov.querySelector('img').src=url; ov.style.display='flex'; }
+  if (customElements.get('photo-cube')) return;
+  customElements.define('photo-cube', class extends HTMLElement {
+    connectedCallback() {
+      var self=this;
+      self._size=parseInt(self.getAttribute('size'))||260;
+      self._speed=parseFloat(self.getAttribute('speed'))||1;
+      self._faceUrls={};
+      FACES.forEach(function(f) { var v=self.getAttribute(f.name); if(v&&v!=='YOUR_PHOTO_URL_HERE') self._faceUrls[f.name]=v; });
+      self._build();
+    }
+    _build() {
+      var self=this,size=self._size,half=size/2,BASE=0.15/self._speed,faceUrls=self._faceUrls;
+      var style=document.createElement('style');
+      style.textContent=
+        '.pc-wrap{display:inline-block;text-align:center;}'+
+        '.pc-scene{width:'+size+'px;height:'+size+'px;perspective:900px;margin:0 auto;cursor:grab;user-select:none;-webkit-user-select:none;}'+
+        '.pc-scene:active{cursor:grabbing;}'+
+        '.pc-cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;}'+
+        '.pc-face{position:absolute;width:'+size+'px;height:'+size+'px;background-size:cover;background-position:center;border:2px solid rgba(92,53,200,0.5);box-shadow:inset 0 0 20px rgba(0,0,0,0.4);cursor:pointer;transition:box-shadow 0.2s;background-color:rgba(10,0,68,0.8);}'+
+        '.pc-face:hover{box-shadow:inset 0 0 0 3px rgba(39,216,198,0.7),0 0 30px rgba(39,216,198,0.3);}'+
+        '.pc-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:rgba(255,255,255,0.2);font-size:11px;font-family:monospace;text-align:center;padding:12px;}';
+      self.appendChild(style);
+      var wrap=document.createElement('div'); wrap.className='pc-wrap';
+      var scene=document.createElement('div'); scene.className='pc-scene';
+      var cube=document.createElement('div'); cube.className='pc-cube';
+      FACES.forEach(function(f) {
+        var el=document.createElement('div'); el.className='pc-face';
+        el.style.transform=f.css.replace(/\{h\}/g,half);
+        if(faceUrls[f.name]) { el.style.backgroundImage='url('+faceUrls[f.name]+')'; }
+        else { el.innerHTML='<div class="pc-placeholder">📸<br>'+f.name.toUpperCase()+'<br>add image url</div>'; }
+        cube.appendChild(el);
+      });
+      scene.appendChild(cube); wrap.appendChild(scene); self.appendChild(wrap);
+      var rotX=-20,rotY=0,velX=0,velY=BASE,dragging=false,dragged=false,startX,startY,lastX,lastY;
+      (function loop() {
+        if(!dragging){velY+=(BASE-velY)*0.03;velX+=(0-velX)*0.03;rotY+=velY;rotX+=velX;}
+        cube.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';
+        requestAnimationFrame(loop);
+      })();
+      scene.addEventListener('mousedown',function(e){dragging=true;dragged=false;velX=0;velY=0;startX=lastX=e.clientX;startY=lastY=e.clientY;});
+      window.addEventListener('mousemove',function(e){if(!dragging)return;var dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.hypot(e.clientX-startX,e.clientY-startY)>8)dragged=true;rotY+=dx*0.4;rotX+=dy*0.4;velY=dx*0.4;velX=dy*0.4;lastX=e.clientX;lastY=e.clientY;});
+      window.addEventListener('mouseup',function(){dragging=false;});
+      scene.addEventListener('touchstart',function(e){dragging=true;dragged=false;velX=0;velY=0;startX=lastX=e.touches[0].clientX;startY=lastY=e.touches[0].clientY;},{passive:true});
+      scene.addEventListener('touchmove',function(e){if(!dragging)return;var dx=e.touches[0].clientX-lastX,dy=e.touches[0].clientY-lastY;if(Math.hypot(e.touches[0].clientX-startX,e.touches[0].clientY-startY)>8)dragged=true;rotY+=dx*0.4;rotX+=dy*0.4;velY=dx*0.4;velX=dy*0.4;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;e.preventDefault();},{passive:false});
+      scene.addEventListener('touchend',function(){dragging=false;});
+      scene.addEventListener('click',function(){if(dragged)return;var url=frontFace(rotX,rotY,faceUrls);if(url)openOverlay(url);});
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "appId": "com.thera bbithole.store",
+  "productName": "The Rabbit Hole",
+  "asar": false,
+  "win": { "target": "nsis" },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "perMachine": false,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "The Rabbit Hole"
+  },
+  "files": ["main-trh.js", "preload.js", "store.html", "config.json"],
+  "extraMetadata": { "main": "main-trh.js" }
+}

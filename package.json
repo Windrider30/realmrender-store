@@ -1,0 +1,19 @@
+{
+  "name": "the-rabbit-hole",
+  "version": "1.0.0",
+  "description": "The Rabbit Hole — Where Side Hustles Become Success Stories.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "build:rr": "electron-builder --win --config electron-builder-rr.json",
+    "build:trh": "electron-builder --win --config electron-builder-trh.json"
+  },
+  "devDependencies": {
+    "electron": "^42.4.1",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "docx": "^9.7.1"
+  }
+}

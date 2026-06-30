@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Red Velvet Revolver — Editorial-Grade AI Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Bebas+Neue&family=Inter:wght@400;600&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --charcoal: #1A1A1A;
+  --charcoal-light: #242424;
+  --charcoal-card: #202020;
+  --crimson: #8B0000;
+  --crimson-dim: rgba(139,0,0,0.15);
+  --crimson-glow: rgba(139,0,0,0.45);
+  --chrome: #C0C0C0;
+  --chrome-dim: rgba(192,192,192,0.12);
+  --chrome-glow: rgba(192,192,192,0.3);
+  --bone: #F5F5F5;
+  --ash: #999999;
+  --muted: #666666;
+  --line: rgba(139,0,0,0.2);
+  --line-chrome: rgba(192,192,192,0.15);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100vh; background: var(--charcoal); color: var(--bone); font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; overflow-x: hidden; }
+
+/* ── BG CANVAS ── */
+#bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-vignette { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(50% 40% at 50% 20%, rgba(139,0,0,0.07), transparent 60%),
+              radial-gradient(30% 30% at 85% 70%, rgba(192,192,192,0.04), transparent 55%),
+              linear-gradient(180deg, rgba(26,26,26,0.2), rgba(26,26,26,0.96)); }
+
+/* ── TOPBAR ── */
+.topbar { position: relative; z-index: 10; text-align: center; padding: 40px 20px 6px; }
+.topbar .eyebrow { font-family: 'Roboto Mono', monospace; font-size: 10px; letter-spacing: 6px; color: var(--crimson); text-transform: uppercase; margin-bottom: 14px; opacity: 0.9; }
+.topbar h1 { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;
+  background: linear-gradient(90deg, var(--crimson), var(--chrome), var(--crimson));
+  background-size: 300%; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  animation: brandPulse 12s ease-in-out infinite; }
+@keyframes brandPulse { 0%,100% { background-position: 0% } 50% { background-position: 300% } }
+.topbar .rule { width: 120px; height: 1px; background: linear-gradient(90deg, transparent, var(--crimson), transparent); margin: 14px auto 10px; }
+.topbar .tagline { font-family: 'Roboto Mono', monospace; color: var(--ash); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+
+/* ── NAV ── */
+.nav-bar { position: relative; z-index: 10; display: flex; justify-content: center; gap: 6px; padding: 18px 20px; flex-wrap: wrap; }
+.nav-btn { font-family: 'Bebas Neue', sans-serif; padding: 8px 22px; font-size: 14px; letter-spacing: 2px; text-transform: uppercase;
+  border: 1px solid var(--line-chrome); border-radius: 0; background: transparent; color: var(--muted); cursor: pointer; transition: .2s; clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%); }
+.nav-btn:hover, .nav-btn.active { color: var(--bone); background: var(--crimson);
+  border-color: var(--crimson); box-shadow: 0 0 18px var(--crimson-glow); }
+
+/* ── PRODUCT GRID ── */
+.store-section { position: relative; z-index: 10; max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 4px; text-transform: uppercase; color: var(--chrome); margin-bottom: 18px;
+  display: flex; align-items: center; gap: 12px; }
+.section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-chrome), transparent); }
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+/* ── PRODUCT CARD ── */
+.product-card { background: var(--charcoal-card); border: 1px solid var(--line-chrome); border-radius: 0; overflow: hidden;
+  cursor: pointer; transition: .25s; position: relative; }
+.product-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--crimson), transparent); opacity: 0; transition: .25s; z-index: 1; }
+.product-card:hover { transform: translateY(-3px); border-color: var(--crimson); box-shadow: 0 10px 40px rgba(139,0,0,0.2), inset 0 0 0 1px rgba(139,0,0,0.1); }
+.product-card:hover::before { opacity: 1; }
+.card-image { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; background: #111; }
+.card-image-placeholder { width: 100%; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #111, #1e0000); font-size: 48px; }
+.card-body { padding: 14px 16px 16px; border-top: 1px solid var(--line); }
+.card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-bottom: 5px; color: var(--bone); }
+.card-desc { font-size: 12px; color: var(--muted); line-height: 1.55; margin-bottom: 10px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; }
+.card-price { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--crimson), var(--chrome)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.card-price.free { background: linear-gradient(90deg, #888, var(--chrome)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.card-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag { font-family: 'Roboto Mono', monospace; font-size: 9px; padding: 3px 8px; border-radius: 0; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.tag-featured { background: var(--crimson-dim); color: var(--crimson); border: 1px solid rgba(139,0,0,0.35); border-left: 2px solid var(--crimson); }
+.tag-premium { background: var(--chrome-dim); color: var(--chrome); border: 1px solid rgba(192,192,192,0.25); }
+.tag-new { background: rgba(245,245,245,0.06); color: var(--bone); border: 1px solid rgba(245,245,245,0.2); }
+
+/* ── FAVORITE BUTTON ── */
+.card-fav { position: absolute; top: 10px; right: 10px; z-index: 5; width: 32px; height: 32px;
+  border: 1px solid var(--line-chrome); background: rgba(26,26,26,0.8); backdrop-filter: blur(6px); color: var(--muted);
+  font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: .2s; border-radius: 0; }
+.card-fav:hover { background: var(--crimson); color: #fff; border-color: var(--crimson); }
+.card-fav.active { color: var(--chrome); background: rgba(139,0,0,0.35); border-color: var(--crimson); }
+
+/* ── LOCKED OVERLAY ── */
+.card-locked { position: absolute; inset: 0; background: rgba(26,26,26,0.92); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 10px; opacity: 0; transition: .25s; }
+.product-card:hover .card-locked { opacity: 1; }
+.card-locked .lock-icon { font-size: 36px; }
+.card-locked .lock-label { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 2px; color: var(--chrome); }
+.btn-buy { font-family: 'Bebas Neue', sans-serif; padding: 10px 28px; border: 1px solid var(--crimson); border-radius: 0; font-size: 14px; letter-spacing: 2px;
+  background: var(--crimson); color: var(--bone); cursor: pointer; transition: .2s; clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%); }
+.btn-buy:hover { background: #a80000; box-shadow: 0 0 24px var(--crimson-glow); }
+
+/* ── IFRAME OVERLAY ── */
+.iframe-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.95); }
+.iframe-overlay.open { display: flex; flex-direction: column; }
+.iframe-topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px;
+  background: var(--charcoal-light); border-bottom: 1px solid var(--line); flex-shrink: 0; }
+.iframe-title { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--crimson), var(--chrome)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.iframe-close { width: 36px; height: 36px; border: 1px solid var(--line-chrome); background: transparent;
+  color: var(--bone); font-size: 18px; cursor: pointer; transition: .2s; display: flex; align-items: center; justify-content: center; }
+.iframe-close:hover { background: var(--crimson); border-color: var(--crimson); }
+.iframe-container { flex: 1; }
+.iframe-container iframe { width: 100%; height: 100%; border: none; background: var(--charcoal); }
+
+/* ── LOADING ── */
+.loading-state { text-align: center; padding: 80px 20px; }
+.loading-spinner { width: 40px; height: 40px; border: 2px solid var(--line-chrome); border-top-color: var(--crimson);
+  border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg) } }
+.loading-text { font-family: 'Roboto Mono', monospace; color: var(--muted); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; }
+
+/* ── EMAIL LOGIN BAR ── */
+.login-bar { position: relative; z-index: 10; display: flex; justify-content: center; gap: 8px; padding: 0 20px 14px; }
+.login-bar input { font-family: 'Roboto Mono', monospace; padding: 9px 16px; font-size: 12px; border: 1px solid var(--line-chrome);
+  background: var(--charcoal-card); color: var(--bone); width: 280px; text-align: center; border-radius: 0; }
+.login-bar input:focus { outline: none; border-color: var(--crimson); box-shadow: 0 0 0 2px var(--crimson-dim); }
+.login-bar button { font-family: 'Bebas Neue', sans-serif; padding: 9px 22px; font-size: 14px; letter-spacing: 2px; border: 1px solid var(--crimson);
+  background: var(--crimson); color: var(--bone); cursor: pointer; transition: .2s; border-radius: 0; }
+.login-bar button:hover { box-shadow: 0 0 16px var(--crimson-glow); background: #a80000; }
+.login-bar .logout-btn { background: transparent; color: var(--ash); border-color: var(--line-chrome); }
+.login-bar .user-email { font-family: 'Roboto Mono', monospace; color: var(--chrome); font-size: 11px; font-weight: 600; padding: 9px 0; letter-spacing: 1px; }
+
+/* ── MODAL ── */
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 900; background: rgba(0,0,0,0.9);
+  align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-box { background: var(--charcoal-card); border: 1px solid var(--line-chrome); border-top: 2px solid var(--crimson); padding: 32px;
+  width: 90%; max-width: 420px; text-align: center; }
+.modal-box h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--crimson), var(--chrome)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.modal-box p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+.modal-input { font-family: 'Roboto Mono', monospace; width: 100%; padding: 12px 16px; font-size: 13px; border: 1px solid var(--line-chrome);
+  background: var(--charcoal); color: var(--bone); text-align: center; border-radius: 0; }
+.modal-input:focus { outline: none; border-color: var(--crimson); box-shadow: 0 0 0 2px var(--crimson-dim); }
+.modal-input.error { border-color: #cc0000; box-shadow: 0 0 0 2px rgba(139,0,0,0.25); }
+.modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+.modal-actions button { font-family: 'Bebas Neue', sans-serif; flex: 1; padding: 11px; font-size: 14px; letter-spacing: 2px; cursor: pointer; border: 1px solid; border-radius: 0; }
+.modal-submit { background: var(--crimson); border-color: var(--crimson); color: var(--bone); }
+.modal-cancel { background: transparent; border-color: var(--line-chrome); color: var(--ash); }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); z-index: 1100;
+  font-family: 'Roboto Mono', monospace; padding: 12px 28px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--bone); background: var(--crimson); border: 1px solid rgba(192,192,192,0.2);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.8); opacity: 0; pointer-events: none; transition: .3s; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── BUNDLE PICKER ── */
+.bundle-picker { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94);
+  align-items: center; justify-content: center; }
+.bundle-picker.open { display: flex; }
+.bundle-picker-box { background: var(--charcoal-card); border: 1px solid var(--line-chrome); border-top: 2px solid var(--crimson);
+  padding: 28px; width: 90%; max-width: 520px; }
+.bundle-picker-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.bundle-picker-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--crimson), var(--chrome)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.bundle-picker-close { width: 32px; height: 32px; border: 1px solid var(--line-chrome); background: transparent;
+  color: var(--bone); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.bundle-picker-close:hover { background: var(--crimson); border-color: var(--crimson); }
+.bundle-picker-sub { font-family: 'Roboto Mono', monospace; font-size: 11px; letter-spacing: 1px; color: var(--muted); margin-bottom: 20px; text-transform: uppercase; }
+.bundle-item { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px; border: 1px solid var(--line-chrome); border-left: 2px solid var(--crimson); margin-bottom: 10px;
+  background: rgba(255,255,255,0.015); }
+.bundle-item-title { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 1.5px; color: var(--bone); }
+.bundle-item-desc { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: 'Inter', sans-serif; }
+.btn-launch { font-family: 'Bebas Neue', sans-serif; padding: 8px 22px; border: 1px solid var(--crimson); font-size: 13px;
+  letter-spacing: 2px; background: var(--crimson); color: var(--bone); cursor: pointer; white-space: nowrap; transition: .2s; border-radius: 0; }
+.btn-launch:hover { box-shadow: 0 0 18px var(--crimson-glow); background: #a80000; }
+.bundle-item-locked { opacity: 0.4; }
+
+/* ── SHOWCASE CUBE ── */
+.showcase-section { position: relative; z-index: 10; text-align: center; padding: 10px 20px 36px; }
+.showcase-label { font-family: 'Roboto Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; color: var(--chrome); margin-bottom: 6px; }
+.showcase-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 900; letter-spacing: 1px; margin-bottom: 4px;
+  background: linear-gradient(135deg, var(--crimson), var(--chrome)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.showcase-sub { font-family: 'Roboto Mono', monospace; font-size: 10px; color: var(--muted); margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .topbar h1 { font-size: 28px; }
+  .product-grid { grid-template-columns: 1fr; }
+  .store-section { padding: 16px 14px 40px; }
+}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<div class="bg-vignette"></div>
+
+<div class="topbar">
+  <p class="eyebrow">&#8226; RVR&#8482; Premium Design Studio &#8226;</p>
+  <h1>Red Velvet Revolver</h1>
+  <div class="rule"></div>
+  <p class="tagline">Editorial-Grade AI Design Framework</p>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn active" onclick="filterCategory('all')">All</button>
+  <button class="nav-btn" onclick="filterCategory('generators')">Generators</button>
+  <button class="nav-btn" onclick="filterCategory('art-packs')">Art Packs</button>
+  <button class="nav-btn" onclick="filterCategory('music')">Music</button>
+  <button class="nav-btn" onclick="filterCategory('bundles')">Bundles</button>
+  <button class="nav-btn" onclick="filterCategory('favorites')">&#9825; Favorites</button>
+  <button class="nav-btn" onclick="filterCategory('library')">&#128218; My Library</button>
+  <button class="nav-btn" onclick="refreshStore()" style="margin-left:auto;border-color:rgba(192,192,192,0.25);">&#x21bb; Refresh</button>
+</div>
+
+<div id="loginBar" class="login-bar"></div>
+
+<div class="showcase-section" id="showcaseSection" style="display:none;">
+  <p class="showcase-label">Sample Outputs</p>
+  <h2 class="showcase-title">See What Gets Created</h2>
+  <p class="showcase-sub">Drag to spin · Click to expand</p>
+  <div style="display:flex;gap:100px;justify-content:center;flex-wrap:wrap;align-items:center;">
+    <photo-cube id="cube1" size="260" front="YOUR_PHOTO_URL_HERE" back="YOUR_PHOTO_URL_HERE" left="YOUR_PHOTO_URL_HERE" right="YOUR_PHOTO_URL_HERE" top="YOUR_PHOTO_URL_HERE" bottom="YOUR_PHOTO_URL_HERE"></photo-cube>
+    <photo-cube id="cube2" size="260" front="YOUR_PHOTO_URL_HERE" back="YOUR_PHOTO_URL_HERE" left="YOUR_PHOTO_URL_HERE" right="YOUR_PHOTO_URL_HERE" top="YOUR_PHOTO_URL_HERE" bottom="YOUR_PHOTO_URL_HERE"></photo-cube>
+  </div>
+</div>
+
+<div class="store-section">
+  <div id="featuredSection" style="display:none;">
+    <p class="section-title">&#9670; Featured Assets</p>
+    <div id="featuredGrid" class="product-grid"></div>
+  </div>
+  <div style="margin-top:28px;">
+    <p class="section-title">&#9670; All Products</p>
+    <div id="productGrid" class="product-grid"></div>
+  </div>
+  <div id="loadingState" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Loading the Arsenal...</p>
+  </div>
+</div>
+
+<!-- IFRAME OVERLAY -->
+<div id="iframeOverlay" class="iframe-overlay">
+  <div class="iframe-topbar">
+    <span id="iframeTitle" class="iframe-title"></span>
+    <button class="iframe-close" onclick="closeGenerator()">&times;</button>
+  </div>
+  <div class="iframe-container">
+    <iframe id="generatorFrame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms" loading="lazy"></iframe>
+  </div>
+</div>
+
+<!-- BUNDLE PICKER MODAL -->
+<div id="bundlePicker" class="bundle-picker">
+  <div class="bundle-picker-box">
+    <div class="bundle-picker-header">
+      <span id="bundlePickerTitle" class="bundle-picker-title"></span>
+      <button class="bundle-picker-close" onclick="closeBundlePicker()">&times;</button>
+    </div>
+    <p id="bundlePickerSub" class="bundle-picker-sub"></p>
+    <div id="bundlePickerList"></div>
+  </div>
+</div>
+
+<!-- EMAIL LOGIN MODAL -->
+<div id="loginModal" class="modal-overlay">
+  <div class="modal-box">
+    <h2>Sign In</h2>
+    <p>Enter the email you used to purchase</p>
+    <input type="email" id="loginEmailInput" class="modal-input" placeholder="your@email.com" autocomplete="email">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeLoginModal()">Cancel</button>
+      <button class="modal-submit" onclick="submitLogin()">Sign In</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   RED VELVET REVOLVER STORE ENGINE
+   Reads products from a published Google Sheet
+   ═══════════════════════════════════════════════ */
+
+// ━━━ CONFIGURATION ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var _params = new URLSearchParams(window.location.search);
+var SHEET_ID = _params.get('sheetId') || '';
+var SHEET_NAME = 'Products';
+var APPS_SCRIPT_URL = _params.get('appsScriptUrl') || '';
+
+function getSheetURL() {
+  return 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/gviz/tq?sheet=' + SHEET_NAME + '&_t=' + Date.now();
+}
+
+// ━━━ STATE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var PRODUCTS = [];
+var UNLOCKED = {};
+var USER_EMAIL = localStorage.getItem('rvr_email') || '';
+var currentFilter = 'all';
+var pendingProduct = null;
+var FAVORITES = JSON.parse(localStorage.getItem('rvr_favorites') || '[]');
+
+// ━━━ LOAD FROM GOOGLE SHEET ━━━━━━━━━━━━━━━━━━
+function loadProducts() {
+  if (window.electronAPI && window.electronAPI.loadProducts) {
+    window.electronAPI.loadProducts().then(function(result) {
+      if (result.success && result.products && result.products.length > 0) {
+        PRODUCTS = result.products.map(function(p) {
+          var norm = {
+            id:           p.id || p.product_id || '',
+            title:        p.title || '',
+            description:  p.description || p.desc || '',
+            category:     (p.category || '').toLowerCase(),
+            price:        p.price || '',
+            image:        p.image || p.image_url || '',
+            generatorUrl: p.generatorUrl || p.generator_url || p.url || '',
+            featured:     p.featured === true || p.featured === 'true' || p.featured === '1' || p.featured === 1,
+            accessType:   (p.accessType || p.access_type || 'free').toLowerCase(),
+            purchaseUrl:  p.purchaseUrl || p.purchase_url || ''
+          };
+          var rawTags = p.tags || p.tag || '';
+          norm.tags = Array.isArray(rawTags)
+            ? rawTags
+            : String(rawTags).split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+          return norm;
+        });
+      } else {
+        PRODUCTS = getSampleProducts();
+      }
+      renderStore();
+    }).catch(function() {
+      PRODUCTS = getSampleProducts();
+      renderStore();
+    });
+    return;
+  }
+
+  // Browser fallback: direct gviz
+  if (SHEET_ID === 'YOUR_GOOGLE_SHEET_ID_HERE') {
+    PRODUCTS = getSampleProducts();
+    renderStore();
+    return;
+  }
+
+  var cbName = 'rvrCallback_' + Date.now();
+  window[cbName] = function(resp) {
+    delete window[cbName];
+    try {
+      parseSheetData(resp);
+      renderStore();
+    } catch(e) {
+      console.error('Parse error:', e);
+      PRODUCTS = getSampleProducts();
+      renderStore();
+    }
+  };
+  var script = document.createElement('script');
+  script.src = getSheetURL() + '&tqx=responseHandler:' + cbName;
+  script.onerror = function() {
+    fetch(getSheetURL())
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        var json = JSON.parse(text.replace(/.*google\.visualization\.Query\.setResponse\(/, '').replace(/\);?\s*$/, ''));
+        parseSheetData(json);
+        renderStore();
+      })
+      .catch(function(err) {
+        console.error('Sheet load error:', err);
+        showToast('Could not load products — using demo data');
+        PRODUCTS = getSampleProducts();
+        renderStore();
+      });
+  };
+  document.body.appendChild(script);
+}
+
+function parseSheetData(json) {
+  var rows = json.table.rows;
+  PRODUCTS = [];
+  rows.forEach(function(row) {
+    var get = function(i) {
+      var cell = row.c[i];
+      return cell && cell.v != null ? String(cell.v) : '';
+    };
+    PRODUCTS.push({
+      id: get(0), title: get(1), description: get(2),
+      category: get(3).toLowerCase(), price: get(4), image: get(5),
+      generatorUrl: get(6),
+      tags: get(7).split(',').map(function(t) { return t.trim(); }).filter(Boolean),
+      featured: get(8).toLowerCase() === 'true' || get(8) === '1',
+      accessType: get(9).toLowerCase() || 'free',
+      purchaseUrl: get(10)
+    });
+  });
+}
+
+// ━━━ SAMPLE DATA ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function getSampleProducts() {
+  return [];
+}
+
+// ━━━ RENDER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderStore() {
+  document.getElementById('loadingState').style.display = 'none';
+  var featured = PRODUCTS.filter(function(p) { return p.featured; });
+  var filtered = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(function(p) { return p.category === currentFilter; });
+
+  if (currentFilter === 'favorites') {
+    filtered = PRODUCTS.filter(function(p) { return FAVORITES.indexOf(p.id) !== -1; });
+  } else if (currentFilter === 'library') {
+    filtered = PRODUCTS.filter(function(p) { return p.accessType === 'free' || UNLOCKED[p.id] || UNLOCKED['all']; });
+  }
+
+  var fs = document.getElementById('featuredSection');
+  var fg = document.getElementById('featuredGrid');
+  if (featured.length > 0 && currentFilter === 'all') {
+    fs.style.display = 'block';
+    fg.innerHTML = featured.map(buildCard).join('');
+  } else {
+    fs.style.display = 'none';
+  }
+
+  var emptyMsg = currentFilter === 'favorites'
+    ? 'No favorites yet — click the ♡ on any asset to save it.'
+    : currentFilter === 'library'
+    ? 'Your library is empty — sign in or purchase an asset to see it here.'
+    : 'No assets in this category yet.';
+
+  document.getElementById('productGrid').innerHTML = filtered.length
+    ? filtered.map(buildCard).join('')
+    : '<p style="color:var(--muted);font-size:13px;font-family:\'Roboto Mono\',monospace;">' + emptyMsg + '</p>';
+}
+
+function buildCard(p) {
+  var isUnlocked = p.accessType === 'free' || UNLOCKED[p.id] || UNLOCKED['all'];
+  var priceClass = p.price === 'Free' || p.price === '0' || p.price === '' ? 'free' : '';
+  var displayPrice = p.price === 'Free' || p.price === '0' || p.price === '' ? 'Free' : p.price;
+
+  var imageHTML = p.image
+    ? '<img class="card-image" src="' + p.image + '" alt="' + p.title + '" loading="lazy">'
+    : '<div class="card-image-placeholder">&#127981;</div>';
+
+  var tagsHTML = p.tags.map(function(t) {
+    var cls = t === 'featured' ? 'tag-featured' : t === 'premium' ? 'tag-premium' : t === 'new' ? 'tag-new' : 'tag-featured';
+    return '<span class="tag ' + cls + '">' + t + '</span>';
+  }).join('');
+
+  var lockOverlay = '';
+  if (!isUnlocked && p.accessType === 'paid') {
+    var buyBtn = p.purchaseUrl
+      ? '<button class="btn-buy" onclick="event.stopPropagation();openPurchasePage(\'' + p.purchaseUrl + '\',\'' + p.title + '\')">Acquire Access</button>'
+      : '';
+    lockOverlay = '<div class="card-locked">' +
+      '<span class="lock-icon">&#128274;</span>' +
+      '<span class="lock-label">' + p.price + '</span>' +
+      buyBtn + '</div>';
+  }
+
+  var isFav = FAVORITES.indexOf(p.id) !== -1;
+  var favBtn = '<button class="card-fav' + (isFav ? ' active' : '') + '" onclick="event.stopPropagation();toggleFavorite(\'' + p.id + '\')">' + (isFav ? '&#9829;' : '&#9825;') + '</button>';
+
+  return '<div class="product-card" onclick="handleCardClick(\'' + p.id + '\')">' +
+    favBtn +
+    imageHTML +
+    '<div class="card-body">' +
+      '<div class="card-title">' + p.title + '</div>' +
+      '<div class="card-desc">' + p.description + '</div>' +
+      '<div class="card-footer">' +
+        '<span class="card-price ' + priceClass + '">' + displayPrice + '</span>' +
+        '<div class="card-tags">' + tagsHTML + '</div>' +
+      '</div>' +
+    '</div>' + lockOverlay + '</div>';
+}
+
+// ━━━ FAVORITES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function toggleFavorite(id) {
+  var idx = FAVORITES.indexOf(id);
+  if (idx === -1) { FAVORITES.push(id); } else { FAVORITES.splice(idx, 1); }
+  localStorage.setItem('rvr_favorites', JSON.stringify(FAVORITES));
+  renderStore();
+}
+
+// ━━━ FILTERING ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function filterCategory(cat) {
+  currentFilter = cat;
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+  var btn = document.querySelector('[onclick="filterCategory(\'' + cat + '\')"]');
+  if (btn) btn.classList.add('active');
+  renderStore();
+}
+
+// ━━━ CARD CLICK ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function handleCardClick(id) {
+  var product = PRODUCTS.find(function(p) { return p.id === id; });
+  if (!product) return;
+
+  if (product.category === 'bundles') {
+    if (product.accessType === 'paid' && !UNLOCKED[id] && !UNLOCKED['all']) {
+      if (product.purchaseUrl) { openPurchasePage(product.purchaseUrl, product.title); }
+      else { showToast('Purchase this bundle to unlock all assets inside'); }
+      return;
+    }
+    var bundleProductIds = (product.generatorUrl || '').split(',').map(function(p) { return p.trim().toLowerCase(); }).filter(Boolean);
+    openBundlePicker(id, product.title, product.description, bundleProductIds, product.accessType);
+    return;
+  }
+
+  if (product.accessType === 'paid' && !UNLOCKED[id] && !UNLOCKED['all']) {
+    if (product.purchaseUrl) {
+      openPurchasePage(product.purchaseUrl, product.title);
+    } else if (!USER_EMAIL) {
+      pendingProduct = id;
+      openLoginModal();
+    } else {
+      showToast('You haven\'t purchased this asset yet');
+    }
+    return;
+  }
+  if (product.generatorUrl) {
+    openGenerator(product);
+  } else {
+    showToast('Generator URL not configured yet');
+  }
+}
+
+// ━━━ BUNDLE PICKER ━━━━━━━━━━━━━━━━━━━━━━━━━━
+function openBundlePicker(bundleId, bundleTitle, bundleDesc, productIds, bundleAccessType) {
+  document.getElementById('bundlePickerTitle').textContent = bundleTitle;
+  document.getElementById('bundlePickerSub').textContent = bundleDesc || 'Select an asset to load';
+  document.getElementById('bundlePicker').classList.add('open');
+
+  var list = document.getElementById('bundlePickerList');
+  if (!productIds || productIds.length === 0) {
+    list.innerHTML = '<p style="color:var(--muted);font-size:12px;font-family:\'Roboto Mono\',monospace;">No assets configured — add product IDs to the generator_url column.</p>';
+    return;
+  }
+
+  list.innerHTML = productIds.map(function(pid) {
+    var product = PRODUCTS.find(function(p) { return p.id.toLowerCase() === pid; });
+    if (!product) return '<div class="bundle-item bundle-item-locked"><div><div class="bundle-item-title">' + pid + '</div><div class="bundle-item-desc">Product not found — check ID in Products sheet</div></div></div>';
+    var hasAccess = UNLOCKED[pid] || UNLOCKED[bundleId.toLowerCase()] || UNLOCKED['all'] || bundleAccessType === 'free' || product.accessType === 'free';
+    var lockedClass = hasAccess ? '' : ' bundle-item-locked';
+    var btn = hasAccess
+      ? '<button class="btn-launch" onclick="launchBundleItem(\'' + pid + '\')">Load</button>'
+      : '<button class="btn-launch" style="background:var(--muted);border-color:var(--muted);cursor:default" disabled>Locked</button>';
+    return '<div class="bundle-item' + lockedClass + '">' +
+      '<div><div class="bundle-item-title">' + product.title + '</div>' +
+      '<div class="bundle-item-desc">' + (product.description || '') + '</div></div>' +
+      btn + '</div>';
+  }).join('');
+}
+
+function closeBundlePicker() {
+  document.getElementById('bundlePicker').classList.remove('open');
+}
+
+function launchBundleItem(pid) {
+  var product = PRODUCTS.find(function(p) { return p.id.toLowerCase() === pid; });
+  if (product && product.generatorUrl) {
+    closeBundlePicker();
+    openGenerator(product);
+  } else {
+    showToast('Asset URL not configured');
+  }
+}
+
+function openGenerator(product) {
+  document.getElementById('iframeTitle').textContent = product.title;
+  document.getElementById('generatorFrame').src = product.generatorUrl;
+  document.getElementById('iframeOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGenerator() {
+  document.getElementById('iframeOverlay').classList.remove('open');
+  document.getElementById('generatorFrame').src = '';
+  document.body.style.overflow = '';
+}
+
+function openPurchasePage(url, title) {
+  document.getElementById('iframeTitle').textContent = 'Acquire: ' + title;
+  document.getElementById('generatorFrame').src = url;
+  document.getElementById('iframeOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// ━━━ EMAIL LOGIN ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function renderLoginBar() {
+  var bar = document.getElementById('loginBar');
+  if (USER_EMAIL) {
+    bar.innerHTML = '<span class="user-email">&#9670; ' + USER_EMAIL + '</span>' +
+      '<button class="logout-btn" onclick="logout()">Sign Out</button>';
+  } else {
+    bar.innerHTML = '<input type="email" id="topEmailInput" placeholder="Enter your purchase email" autocomplete="email">' +
+      '<button onclick="loginFromBar()">Sign In</button>';
+  }
+}
+
+function openLoginModal() {
+  document.getElementById('loginEmailInput').value = '';
+  document.getElementById('loginEmailInput').classList.remove('error');
+  document.getElementById('loginModal').classList.add('open');
+  setTimeout(function() { document.getElementById('loginEmailInput').focus(); }, 100);
+}
+
+function closeLoginModal() {
+  document.getElementById('loginModal').classList.remove('open');
+  pendingProduct = null;
+}
+
+function loginFromBar() {
+  var input = document.getElementById('topEmailInput');
+  var email = input ? input.value.trim().toLowerCase() : '';
+  if (!email || email.indexOf('@') === -1) { showToast('Enter a valid email'); return; }
+  doLogin(email);
+}
+
+function submitLogin() {
+  var email = document.getElementById('loginEmailInput').value.trim().toLowerCase();
+  if (!email || email.indexOf('@') === -1) { document.getElementById('loginEmailInput').classList.add('error'); return; }
+  doLogin(email);
+}
+
+function doLogin(email) {
+  showToast('Checking access...');
+  var handler = window.electronAPI
+    ? window.electronAPI.checkAccess(email)
+    : fetch(APPS_SCRIPT_URL + '?action=check&email=' + encodeURIComponent(email) + '&sheetId=' + encodeURIComponent(SHEET_ID)).then(function(r) { return r.json(); });
+
+  handler.then(function(result) {
+    USER_EMAIL = email;
+    localStorage.setItem('rvr_email', email);
+    UNLOCKED = {};
+    if (result.success && result.products) {
+      result.products.forEach(function(pid) { UNLOCKED[pid] = true; });
+      showToast(result.products.length + ' asset' + (result.products.length === 1 ? '' : 's') + ' unlocked');
+    } else {
+      showToast('Signed in — no purchases found yet');
+    }
+    closeLoginModal();
+    renderLoginBar();
+    renderStore();
+    if (pendingProduct && (UNLOCKED[pendingProduct] || UNLOCKED['all'])) {
+      var product = PRODUCTS.find(function(p) { return p.id === pendingProduct; });
+      if (product && product.generatorUrl) setTimeout(function() { openGenerator(product); }, 600);
+      pendingProduct = null;
+    }
+  }).catch(function() { showToast('Could not connect — try again'); });
+}
+
+function logout() {
+  USER_EMAIL = ''; UNLOCKED = {};
+  localStorage.removeItem('rvr_email');
+  renderLoginBar(); renderStore();
+  showToast('Signed out');
+}
+
+// ━━━ KEYBOARD ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (document.getElementById('iframeOverlay').classList.contains('open')) closeGenerator();
+    if (document.getElementById('loginModal').classList.contains('open')) closeLoginModal();
+    if (document.getElementById('bundlePicker').classList.contains('open')) closeBundlePicker();
+  }
+  if (e.key === 'Enter' && document.getElementById('loginModal').classList.contains('open')) submitLogin();
+  if (e.key === 'Enter' && document.activeElement && document.activeElement.id === 'topEmailInput') loginFromBar();
+});
+
+// ━━━ REFRESH ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function refreshStore() {
+  showToast('Refreshing...');
+  loadProducts();
+  if (USER_EMAIL) doLogin(USER_EMAIL);
+}
+
+// ━━━ TOAST ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var toastTimer;
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+// ━━━ BG ANIMATION (grain & embers) ━━━━━━━━━━
+(function() {
+  var c = document.getElementById('bgCanvas'), x = c.getContext('2d'), W, H;
+  var motes = [];
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function resize() { W = c.width = innerWidth; H = c.height = innerHeight; init(); }
+  function init() {
+    motes = [];
+    var n = Math.max(15, Math.floor(W / 40));
+    for (var i = 0; i < n; i++) {
+      motes.push({
+        x: rnd(0, W), y: rnd(0, H), r: rnd(0.2, 1.2),
+        vy: rnd(-0.06, 0.02), vx: rnd(-0.02, 0.02),
+        tw: rnd(0, 6.28), ts: rnd(0.003, 0.01),
+        type: Math.random() < 0.6 ? 'crimson' : 'chrome'
+      });
+    }
+  }
+  function frame() {
+    x.clearRect(0, 0, W, H);
+    var g = x.createRadialGradient(W / 2, H * 0.25, 0, W / 2, H * 0.25, Math.min(W, H) * 0.45);
+    g.addColorStop(0, 'rgba(139,0,0,0.05)');
+    g.addColorStop(1, 'transparent');
+    x.fillStyle = g; x.fillRect(0, 0, W, H);
+    for (var i = 0; i < motes.length; i++) {
+      var m = motes[i];
+      m.y += m.vy; m.x += m.vx + Math.sin(m.tw) * 0.04; m.tw += m.ts;
+      if (m.y < -4) m.y = H + 4; if (m.y > H + 4) m.y = -4;
+      if (m.x < -4) m.x = W + 4; if (m.x > W + 4) m.x = -4;
+      var a = 0.1 + 0.4 * Math.abs(Math.sin(m.tw));
+      x.beginPath(); x.arc(m.x, m.y, m.r, 0, 6.28);
+      if (m.type === 'crimson') {
+        x.shadowColor = 'rgba(139,0,0,0.6)'; x.fillStyle = 'rgba(139,0,0,' + (0.5 * a) + ')';
+      } else {
+        x.shadowColor = 'rgba(192,192,192,0.4)'; x.fillStyle = 'rgba(192,192,192,' + (0.3 * a) + ')';
+      }
+      x.shadowBlur = 5; x.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize', resize);
+  resize(); frame();
+})();
+
+// ━━━ SETTINGS → CUBE PHOTOS ━━━━━━━━━━━━━━━━━
+function loadSettings() {
+  if (!APPS_SCRIPT_URL) return;
+  var url = APPS_SCRIPT_URL + '?action=getSettings' + (SHEET_ID ? '&sheetId=' + encodeURIComponent(SHEET_ID) : '');
+  fetch(url)
+    .then(function(r) { return r.json(); })
+    .then(function(result) { if (result.success && result.settings) applyCubePhotos(result.settings); })
+    .catch(function(e) { console.error('Settings load error:', e); });
+}
+
+function applyCubePhotos(settings) {
+  var faces = ['front','back','left','right','top','bottom'];
+  var anySection = false;
+  [['cube1','cube_'],['cube2','cube2_']].forEach(function(pair) {
+    var cube = document.getElementById(pair[0]);
+    if (!cube) return;
+    var hasAny = false;
+    faces.forEach(function(face) { var url = settings[pair[1] + face]; if (url) { cube.setAttribute(face, url); hasAny = true; } });
+    if (hasAny) { cube.innerHTML = ''; cube.connectedCallback(); anySection = true; }
+  });
+  if (anySection) { var sec = document.getElementById('showcaseSection'); if (sec) sec.style.display = ''; }
+}
+
+// ━━━ INIT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+renderLoginBar();
+loadProducts();
+loadSettings();
+if (USER_EMAIL) { doLogin(USER_EMAIL); }
+</script>
+
+<script>
+(function () {
+  var FACES = [
+    { name: 'front',  css: 'translateZ({h}px)',                 normal: [ 0,  0,  1] },
+    { name: 'back',   css: 'rotateY(180deg) translateZ({h}px)', normal: [ 0,  0, -1] },
+    { name: 'left',   css: 'rotateY(-90deg) translateZ({h}px)', normal: [-1,  0,  0] },
+    { name: 'right',  css: 'rotateY(90deg) translateZ({h}px)',  normal: [ 1,  0,  0] },
+    { name: 'top',    css: 'rotateX(90deg) translateZ({h}px)',  normal: [ 0, -1,  0] },
+    { name: 'bottom', css: 'rotateX(-90deg) translateZ({h}px)', normal: [ 0,  1,  0] },
+  ];
+  function frontFace(rotX, rotY, faceUrls) {
+    var rx=rotX*Math.PI/180,ry=rotY*Math.PI/180,best=null,bestZ=-Infinity;
+    FACES.forEach(function(f){var nx=f.normal[0],ny=f.normal[1],nz=f.normal[2],nz2=-Math.sin(ry)*nx+Math.cos(ry)*nz,nz3=Math.sin(rx)*ny+Math.cos(rx)*nz2;if(nz3>bestZ){bestZ=nz3;best=f.name;}});
+    return (best&&faceUrls[best])?faceUrls[best]:null;
+  }
+  var sharedOverlay=null;
+  function getOverlay(){
+    if(sharedOverlay)return sharedOverlay;
+    var ov=document.createElement('div');
+    ov.style.cssText='display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.95);align-items:center;justify-content:center;cursor:zoom-out;';
+    var img=document.createElement('img');
+    img.style.cssText='max-width:90vw;max-height:90vh;border-radius:0;border:2px solid rgba(139,0,0,0.6);box-shadow:0 0 60px rgba(139,0,0,0.4);';
+    ov.appendChild(img);
+    ov.addEventListener('click',function(){ov.style.display='none';});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')ov.style.display='none';});
+    document.body.appendChild(ov);
+    sharedOverlay=ov;
+    return ov;
+  }
+  function openOverlay(url){var ov=getOverlay();ov.querySelector('img').src=url;ov.style.display='flex';}
+  if(customElements.get('photo-cube'))return;
+  customElements.define('photo-cube',class extends HTMLElement{
+    connectedCallback(){
+      var self=this;
+      self._size=parseInt(self.getAttribute('size'))||260;
+      self._speed=parseFloat(self.getAttribute('speed'))||1;
+      self._faceUrls={};
+      FACES.forEach(function(f){var v=self.getAttribute(f.name);if(v&&v!=='YOUR_PHOTO_URL_HERE')self._faceUrls[f.name]=v;});
+      self._build();
+    }
+    _build(){
+      var self=this,size=self._size,half=size/2,BASE=0.15/self._speed,faceUrls=self._faceUrls;
+      var style=document.createElement('style');
+      style.textContent=
+        '.pc-wrap{display:inline-block;text-align:center;}'+
+        '.pc-scene{width:'+size+'px;height:'+size+'px;perspective:900px;margin:0 auto;cursor:grab;user-select:none;-webkit-user-select:none;}'+
+        '.pc-scene:active{cursor:grabbing;}'+
+        '.pc-cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;}'+
+        '.pc-face{position:absolute;width:'+size+'px;height:'+size+'px;background-size:cover;background-position:center;border:2px solid rgba(139,0,0,0.5);box-shadow:inset 0 0 20px rgba(0,0,0,0.5);cursor:pointer;transition:box-shadow 0.2s;background-color:rgba(26,0,0,0.8);}'+
+        '.pc-face:hover{box-shadow:inset 0 0 0 3px rgba(192,192,192,0.6),0 0 30px rgba(139,0,0,0.4);}'+
+        '.pc-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;color:rgba(255,255,255,0.15);font-size:11px;font-family:monospace;text-align:center;padding:12px;}';
+      self.appendChild(style);
+      var wrap=document.createElement('div');wrap.className='pc-wrap';
+      var scene=document.createElement('div');scene.className='pc-scene';
+      var cube=document.createElement('div');cube.className='pc-cube';
+      FACES.forEach(function(f){
+        var el=document.createElement('div');el.className='pc-face';
+        el.style.transform=f.css.replace(/\{h\}/g,half);
+        if(faceUrls[f.name]){el.style.backgroundImage='url('+faceUrls[f.name]+')';}
+        else{el.innerHTML='<div class="pc-placeholder">📸<br>'+f.name.toUpperCase()+'<br>add image url</div>';}
+        cube.appendChild(el);
+      });
+      scene.appendChild(cube);wrap.appendChild(scene);self.appendChild(wrap);
+      var rotX=-20,rotY=0,velX=0,velY=BASE,dragging=false,dragged=false,startX,startY,lastX,lastY;
+      (function loop(){
+        if(!dragging){velY+=(BASE-velY)*0.03;velX+=(0-velX)*0.03;rotY+=velY;rotX+=velX;}
+        cube.style.transform='rotateX('+rotX+'deg) rotateY('+rotY+'deg)';
+        requestAnimationFrame(loop);
+      })();
+      scene.addEventListener('mousedown',function(e){dragging=true;dragged=false;velX=0;velY=0;startX=lastX=e.clientX;startY=lastY=e.clientY;});
+      window.addEventListener('mousemove',function(e){if(!dragging)return;var dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.hypot(e.clientX-startX,e.clientY-startY)>8)dragged=true;rotY+=dx*0.4;rotX+=dy*0.4;velY=dx*0.4;velX=dy*0.4;lastX=e.clientX;lastY=e.clientY;});
+      window.addEventListener('mouseup',function(){dragging=false;});
+      scene.addEventListener('touchstart',function(e){dragging=true;dragged=false;velX=0;velY=0;startX=lastX=e.touches[0].clientX;startY=lastY=e.touches[0].clientY;},{passive:true});
+      scene.addEventListener('touchmove',function(e){if(!dragging)return;var dx=e.touches[0].clientX-lastX,dy=e.touches[0].clientY-lastY;if(Math.hypot(e.touches[0].clientX-startX,e.touches[0].clientY-startY)>8)dragged=true;rotY+=dx*0.4;rotX+=dy*0.4;velY=dx*0.4;velX=dy*0.4;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;e.preventDefault();},{passive:false});
+      scene.addEventListener('touchend',function(){dragging=false;});
+      scene.addEventListener('click',function(){if(dragged)return;var url=frontFace(rotX,rotY,faceUrls);if(url)openOverlay(url);});
+    }
+  });
+})();
+</script>
+</body>
+</html>

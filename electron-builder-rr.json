@@ -1,0 +1,17 @@
+{
+  "appId": "com.realmrender.store",
+  "productName": "RealmRender",
+  "asar": false,
+  "win": { "target": "nsis" },
+  "mac": { "target": "dmg", "category": "public.app-category.utilities" },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "perMachine": false,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "RealmRender"
+  },
+  "files": ["main.js", "preload.js", "store.html", "config.json"],
+  "extraMetadata": { "main": "main.js" }
+}
