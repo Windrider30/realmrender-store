@@ -674,8 +674,10 @@ function openOverlay(url, title) {
   document.body.style.overflow = 'hidden';
 }
 function closeOverlay() {
+  var wv = document.getElementById('generatorFrame');
+  wv.src = 'about:blank';
+  setTimeout(function() { wv.src = ''; }, 50);
   document.getElementById('iframeOverlay').classList.remove('open');
-  document.getElementById('generatorFrame').src = '';
   document.body.style.overflow = '';
 }
 
