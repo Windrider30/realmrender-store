@@ -79,6 +79,21 @@ function createWindow() {
     query: { sheetId: cfg.sheetId || '', appsScriptUrl: cfg.appsScriptUrl || '', emailKey: 'rr_email', favKey: 'rr_favorites' }
   });
 
+  mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
+    if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
+      callback(true);
+    } else {
+      callback(false);
+    }
+  });
+
+  mainWindow.webContents.session.setPermissionCheckHandler((webContents, permission) => {
+    if (permission === 'clipboard-read' || permission === 'clipboard-sanitized-write') {
+      return true;
+    }
+    return false;
+  });
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => { shell.openExternal(url); return { action: 'deny' }; });
   mainWindow.webContents.on('before-input-event', (event, input) => {
     if (input.key === 'F12' || (input.control && input.shift && (input.key === 'I' || input.key === 'i'))) event.preventDefault();
