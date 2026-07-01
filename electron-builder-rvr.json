@@ -3,6 +3,7 @@
   "productName": "Red Velvet Revolver",
   "asar": false,
   "win": { "target": "nsis" },
+  "mac": { "target": "dmg", "category": "public.app-category.utilities" },
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
