@@ -42,13 +42,44 @@ html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-
 .topbar .tagline { color: var(--muted); font-size: 12px; letter-spacing: 4px; text-transform: uppercase; margin-top: 6px; }
 
 /* ── NAV ── */
-.nav-bar { position: relative; z-index: 10; display: flex; justify-content: center; gap: 8px; padding: 14px 20px; flex-wrap: wrap; }
+.nav-bar { position: relative; z-index: 10; display: flex; justify-content: center; align-items: center; gap: 8px; padding: 14px 20px; flex-wrap: wrap; }
 .nav-btn { padding: 9px 20px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
   border: 1px solid var(--line); border-radius: 30px; background: transparent; color: var(--muted); cursor: pointer; transition: .2s; }
 .nav-btn:hover, .nav-btn.active { color: var(--bg); background: linear-gradient(135deg, var(--primary), var(--secondary));
   border-color: transparent; box-shadow: 0 0 20px var(--p-glow); }
 .nav-btn.nav-link { border-color: var(--line2); }
 .nav-btn.nav-link:hover { background: var(--primary); color: #fff; border-color: transparent; }
+
+/* ── SOCIAL BAR ── */
+.social-link { display:inline-flex; align-items:center; justify-content:center; width:32px; height:32px;
+  border-radius:50%; border:1px solid var(--line); color:var(--muted); text-decoration:none;
+  font-size:15px; transition:.2s; }
+.social-link:hover { border-color:var(--primary); color:var(--primary); box-shadow:0 0 12px var(--p-glow); }
+
+/* ── HAMBURGER ── */
+.hamburger-btn { padding: 9px 14px; font-size: 18px; font-weight: 700; line-height: 1;
+  border: 1px solid var(--line); border-radius: 30px; background: transparent; color: var(--muted);
+  cursor: pointer; transition: .2s; display: flex; align-items: center; gap: 6px; }
+.hamburger-btn:hover { color: var(--text); border-color: var(--line2); }
+.hamburger-btn.has-active { color: var(--bg); background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent; box-shadow: 0 0 20px var(--p-glow); }
+.side-panel-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.5); }
+.side-panel-overlay.open { display: block; }
+.side-panel { position: fixed; top: 0; left: -320px; width: 300px; height: 100vh; z-index: 501;
+  background: var(--card); border-right: 1px solid var(--line); padding: 24px 16px;
+  display: flex; flex-direction: column; gap: 6px; overflow-y: auto;
+  transition: left .25s cubic-bezier(.4,0,.2,1); }
+.side-panel.open { left: 0; }
+.side-panel-title { font-size: 10px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--muted); padding: 8px 12px 4px; margin-top: 8px; }
+.side-panel-title:first-child { margin-top: 0; }
+.panel-btn { padding: 11px 16px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--muted);
+  cursor: pointer; transition: .2s; text-align: left; width: 100%; }
+.panel-btn:hover { background: rgba(255,255,255,0.05); color: var(--text); border-color: var(--line); }
+.panel-btn.active { color: var(--bg); background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent; }
+.side-panel-divider { height: 1px; background: var(--line); margin: 8px 0; }
 
 /* ── LOGIN BAR ── */
 .login-bar { position: relative; z-index: 10; display: flex; justify-content: center; gap: 8px; padding: 0 20px 10px; flex-wrap: wrap; align-items: center; }
@@ -111,6 +142,34 @@ html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-
 .btn-buy { padding: 10px 28px; border: none; border-radius: 30px; font-size: 12px; font-weight: 800; letter-spacing: 1px;
   background: linear-gradient(135deg, var(--primary), var(--secondary)); color: var(--bg); cursor: pointer; transition: .2s; }
 .btn-buy:hover { box-shadow: 0 0 24px var(--s-glow); transform: scale(1.05); }
+
+/* ── MESSAGE BOARD ── */
+.board-section { position: relative; z-index: 10; max-width: 800px; margin: 0 auto; padding: 16px 24px 60px; }
+.board-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.board-tab { padding: 7px 18px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  border: 1px solid var(--line); border-radius: 30px; background: transparent; color: var(--muted); cursor: pointer; transition: .2s; }
+.board-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.board-compose { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+.board-compose input, .board-compose textarea {
+  width: 100%; box-sizing: border-box; background: var(--bg); border: 1px solid var(--line2);
+  border-radius: 8px; color: var(--text); font-family: inherit; font-size: 13px; padding: 10px 14px; margin-bottom: 10px; resize: vertical; }
+.board-compose textarea { min-height: 80px; }
+.board-compose .compose-row { display: flex; gap: 10px; align-items: center; }
+.board-compose .compose-row input { margin-bottom: 0; flex: 1; }
+.btn-post { padding: 10px 24px; background: var(--primary); border: none; border-radius: 30px;
+  color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: .2s; white-space: nowrap; }
+.btn-post:hover { opacity: .85; }
+.board-messages { display: flex; flex-direction: column; gap: 12px; }
+.board-msg { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; position: relative; }
+.board-msg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.board-msg-name { font-size: 12px; font-weight: 700; color: var(--primary); }
+.board-msg-time { font-size: 10px; color: var(--muted); }
+.board-msg-text { font-size: 13px; color: var(--text); line-height: 1.5; white-space: pre-wrap; word-break: break-word; }
+.btn-delete-msg { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: .2s; }
+.btn-delete-msg:hover { color: #ff4466; background: rgba(255,68,102,0.1); }
+.board-empty { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
+.board-login-notice { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 16px; text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 16px; }
 
 /* ── IFRAME OVERLAY ── */
 .iframe-overlay { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.94); }
@@ -194,19 +253,37 @@ html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-
 
 <div class="topbar">
   <p class="eyebrow" id="eyebrow"></p>
+  <img id="brandLogo" src="" alt="" style="display:none;max-height:120px;max-width:360px;object-fit:contain;margin:0 auto 12px;">
   <h1 id="brandName">Store</h1>
   <p class="tagline" id="brandTagline"></p>
+  <div id="socialBar" style="display:none;justify-content:center;gap:14px;margin-top:10px;flex-wrap:wrap;"></div>
 </div>
 
 <div class="nav-bar" id="navBar">
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidePanel()">&#9776; Menu</button>
   <button class="nav-btn active" onclick="filterCategory('all')">All</button>
-  <!-- dynamic nav buttons injected here -->
   <button class="nav-btn" onclick="filterCategory('favorites')">&#9825; Favorites</button>
   <button class="nav-btn" onclick="filterCategory('library')">&#128218; My Library</button>
   <button class="nav-btn" onclick="refreshStore()" style="margin-left:auto;border-color:var(--line2);">&#x21bb; Refresh</button>
 </div>
 
+<!-- SIDE PANEL -->
+<div class="side-panel-overlay" id="sidePanelOverlay" onclick="closeSidePanel()"></div>
+<div class="side-panel" id="sidePanel">
+  <p class="side-panel-title">Categories</p>
+  <div id="panelNavItems"></div>
+  <div class="side-panel-divider"></div>
+  <p class="side-panel-title">Community</p>
+  <button class="panel-btn" id="panelCommunityBtn" onclick="panelOpenBoard()">💬 Community Board</button>
+</div>
+
 <div id="loginBar" class="login-bar"></div>
+
+<!-- FEATURED PRODUCTS -->
+<div id="featuredSection" style="display:none;padding:0 32px 8px;position:relative;z-index:10;max-width:1280px;margin:0 auto;">
+  <p class="section-title" id="featuredLabel">&#10024; Featured</p>
+  <div id="featuredGrid" class="product-grid"></div>
+</div>
 
 <!-- SHOWCASE CUBES -->
 <div class="showcase-section" id="showcaseSection" style="display:none;">
@@ -226,10 +303,6 @@ html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-
 </div>
 
 <div class="store-section">
-  <div id="featuredSection" style="display:none;">
-    <p class="section-title" id="featuredLabel">&#10024; Featured</p>
-    <div id="featuredGrid" class="product-grid"></div>
-  </div>
   <div style="margin-top:24px;">
     <p class="section-title" id="allLabel">&#128293; All Products</p>
     <div id="productGrid" class="product-grid"></div>
@@ -237,6 +310,24 @@ html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-
   <div id="loadingState" class="loading-state">
     <div class="loading-spinner"></div>
     <p class="loading-text" id="loadingText">Loading...</p>
+  </div>
+</div>
+
+<!-- MESSAGE BOARD -->
+<div id="boardSection" style="display:none;">
+  <div class="board-section">
+    <div class="board-tabs" id="boardTabs"></div>
+    <div id="boardLoginNotice" class="board-login-notice" style="display:none;">
+      Sign in to post on the Buyers board and category boards.
+    </div>
+    <div class="board-compose" id="boardCompose">
+      <div class="compose-row">
+        <input type="text" id="boardName" placeholder="Your name (optional)" maxlength="50">
+        <button class="btn-post" onclick="submitPost()">Post</button>
+      </div>
+      <textarea id="boardMessage" placeholder="Write a message..." maxlength="1000"></textarea>
+    </div>
+    <div class="board-messages" id="boardMessages"></div>
   </div>
 </div>
 
@@ -346,6 +437,28 @@ function applySettings(s) {
   if (s.brand_name)    { document.getElementById('brandName').textContent = s.brand_name; document.title = s.window_title || s.brand_name; }
   if (s.brand_tagline) document.getElementById('brandTagline').textContent = s.brand_tagline;
   if (s.eyebrow_text)  { var ey = document.getElementById('eyebrow'); ey.textContent = s.eyebrow_text; ey.classList.add('visible'); }
+  if (s.brand_logo)    { var logo = document.getElementById('brandLogo'); logo.src = s.brand_logo; logo.style.display = 'block'; }
+
+  // Social links
+  var socialDefs = [
+    { key: 'social_instagram', icon: '📸', label: 'Instagram' },
+    { key: 'social_tiktok',    icon: '🎵', label: 'TikTok' },
+    { key: 'social_facebook',  icon: '👥', label: 'Facebook' },
+    { key: 'social_youtube',   icon: '▶', label: 'YouTube' },
+    { key: 'social_twitter',   icon: '𝕏', label: 'Twitter/X' },
+    { key: 'social_discord',   icon: '💬', label: 'Discord' },
+    { key: 'social_pinterest', icon: '📌', label: 'Pinterest' },
+    { key: 'social_linkedin',  icon: '💼', label: 'LinkedIn' },
+    { key: 'social_website',   icon: '🌐', label: 'Website' }
+  ];
+  var socialBar = document.getElementById('socialBar');
+  var socialHtml = '';
+  socialDefs.forEach(function(def) {
+    if (s[def.key]) {
+      socialHtml += '<a class="social-link" href="' + s[def.key] + '" title="' + def.label + '" onclick="event.preventDefault();openExternal(\'' + s[def.key] + '\')">' + def.icon + '</a>';
+    }
+  });
+  if (socialHtml) { socialBar.innerHTML = socialHtml; socialBar.style.display = 'flex'; }
   if (s.loading_text)  document.getElementById('loadingText').textContent = s.loading_text;
   if (s.featured_label) document.getElementById('featuredLabel').textContent = s.featured_label;
   if (s.all_label)      document.getElementById('allLabel').textContent = s.all_label;
@@ -426,31 +539,58 @@ function loadNav() {
 }
 
 function renderNav() {
-  var bar = document.getElementById('navBar');
-  // Keep All, Favorites, Library, Refresh — replace everything else
-  var allBtn      = bar.children[0];
-  var favBtn      = bar.children[bar.children.length - 3];
-  var libBtn      = bar.children[bar.children.length - 2];
-  var refreshBtn  = bar.children[bar.children.length - 1];
+  var panel = document.getElementById('panelNavItems');
+  panel.innerHTML = '';
 
-  // Remove old dynamic buttons
-  while (bar.children.length > 4) bar.removeChild(bar.children[1]);
-
-  // Insert new dynamic buttons before Favorites
   NAV_ITEMS.forEach(function(item) {
+    if (item.accessRequired) {
+      var hasAccess = UNLOCKED['all'] || UNLOCKED[item.accessRequired];
+      if (!hasAccess) return;
+    }
     var btn = document.createElement('button');
     if (item.url) {
-      btn.className = 'nav-btn nav-link';
+      btn.className = 'panel-btn';
       btn.innerHTML = (item.label || 'Link') + ' &#8599;';
-      btn.onclick = function() { openOverlay(item.url, item.label); };
+      btn.onclick = function() { closeSidePanel(); openOverlay(item.url, item.label); };
     } else {
-      btn.className = 'nav-btn';
-      btn.textContent = item.label || item.category;
       var cat = item.category;
-      btn.onclick = function() { filterCategory(cat); };
+      btn.className = 'panel-btn' + (currentFilter === cat ? ' active' : '');
+      btn.textContent = item.label || item.category;
+      btn.onclick = function() { closeSidePanel(); filterCategory(cat); };
     }
-    bar.insertBefore(btn, favBtn);
+    panel.appendChild(btn);
   });
+
+  // Highlight hamburger if a panel category is active
+  var panelActive = NAV_ITEMS.some(function(item) { return item.category === currentFilter; });
+  var hb = document.getElementById('hamburgerBtn');
+  if (hb) {
+    if (panelActive || currentFilter === 'board') hb.classList.add('has-active');
+    else hb.classList.remove('has-active');
+  }
+
+  // Community btn highlight
+  var cb = document.getElementById('panelCommunityBtn');
+  if (cb) cb.className = 'panel-btn' + (currentFilter === 'board' ? ' active' : '');
+}
+
+function toggleSidePanel() {
+  var panel   = document.getElementById('sidePanel');
+  var overlay = document.getElementById('sidePanelOverlay');
+  var isOpen  = panel.classList.contains('open');
+  if (isOpen) { closeSidePanel(); } else { panel.classList.add('open'); overlay.classList.add('open'); }
+}
+
+function closeSidePanel() {
+  document.getElementById('sidePanel').classList.remove('open');
+  document.getElementById('sidePanelOverlay').classList.remove('open');
+}
+
+function panelOpenBoard() {
+  closeSidePanel();
+  currentFilter = 'board';
+  renderNav();
+  openBoard();
 }
 
 // ━━━ PRODUCTS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -633,9 +773,13 @@ function toggleFavorite(id) {
 // ━━━ FILTERING ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function filterCategory(cat) {
   currentFilter = cat;
-  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
-  var btn = document.querySelector('[onclick="filterCategory(\''+cat+'\')"]');
-  if (btn) btn.classList.add('active');
+  document.getElementById('boardSection').style.display = 'none';
+  document.querySelector('.store-section').style.display = '';
+  // Highlight correct top bar btn
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  var topBtn = document.querySelector('.nav-bar .nav-btn[onclick="filterCategory(\''+cat+'\')"]');
+  if (topBtn) topBtn.classList.add('active');
+  renderNav();
   renderStore();
 }
 
@@ -664,6 +808,14 @@ function handleCardClick(id) {
 
   if (p.generatorUrl) openOverlay(p.generatorUrl, p.title);
   else showToast('Generator URL not configured yet');
+}
+
+function openExternal(url) {
+  if (window.electronAPI && window.electronAPI.openExternal) {
+    window.electronAPI.openExternal(url);
+  } else {
+    window.open(url, '_blank');
+  }
 }
 
 // ━━━ OVERLAY (generator + purchase + external links) ━━━
@@ -750,12 +902,14 @@ function doLogin(email, silent) {
     UNLOCKED = {};
     if (result.success && result.products) {
       result.products.forEach(function(pid){UNLOCKED[pid]=true;});
+      if (result.allAccess) UNLOCKED['all'] = true;
       if(!silent) showToast('Welcome! '+result.products.length+' product'+(result.products.length===1?'':'s')+' unlocked');
     } else {
       if(!silent) showToast('Signed in — no purchases found yet');
     }
     closeLoginModal();
     renderLoginBar();
+    renderNav();
     renderStore();
     if (pendingProduct && (UNLOCKED[pendingProduct]||UNLOCKED['all'])) {
       var p=PRODUCTS.find(function(x){return x.id===pendingProduct;});
@@ -768,8 +922,150 @@ function doLogin(email, silent) {
 function logout() {
   USER_EMAIL=''; UNLOCKED={};
   localStorage.removeItem(EMAIL_KEY);
-  renderLoginBar(); renderStore();
+  renderLoginBar(); renderNav(); renderStore();
   showToast('Signed out');
+}
+
+// ━━━ MESSAGE BOARD ━━━━━━━━━━━━━━━━━━━━━━━━━━
+var CURRENT_BOARD = 'public';
+var BOARD_OWNER_EMAIL = '';
+
+function openBoard() {
+  document.getElementById('boardSection').style.display = 'block';
+  document.getElementById('showcaseSection').style.display = 'none';
+  document.querySelector('.store-section').style.display = 'none';
+  document.getElementById('featuredSection').style.display = 'none';
+  document.querySelectorAll('.nav-btn').forEach(function(b){ b.classList.remove('active'); });
+  renderNav();
+  buildBoardTabs();
+  loadBoard(CURRENT_BOARD);
+}
+
+function closeBoard() {
+  currentFilter = 'all';
+  document.getElementById('boardSection').style.display = 'none';
+  document.querySelector('.store-section').style.display = '';
+  renderNav();
+  renderStore();
+}
+
+function buildBoardTabs() {
+  var tabs = [{ id: 'public', label: '🌐 Public' }];
+  if (USER_EMAIL && Object.keys(UNLOCKED).length > 0) {
+    tabs.push({ id: 'buyers', label: '🛒 Buyers' });
+  }
+  NAV_ITEMS.forEach(function(item) {
+    if (!item.accessRequired) return;
+    var hasAccess = UNLOCKED['all'] || UNLOCKED[item.accessRequired];
+    if (hasAccess && item.category) {
+      tabs.push({ id: item.category, label: '🔒 ' + item.label });
+    }
+  });
+
+  var html = tabs.map(function(t) {
+    return '<button class="board-tab' + (CURRENT_BOARD === t.id ? ' active' : '') +
+      '" onclick="switchBoard(\'' + t.id + '\')">' + t.label + '</button>';
+  }).join('');
+  document.getElementById('boardTabs').innerHTML = html;
+
+  // Show/hide compose based on board access
+  var canPost = CURRENT_BOARD === 'public' || USER_EMAIL;
+  document.getElementById('boardCompose').style.display = canPost ? 'block' : 'none';
+  var notice = document.getElementById('boardLoginNotice');
+  notice.style.display = (!USER_EMAIL && CURRENT_BOARD !== 'public') ? 'block' : 'none';
+
+  // Pre-fill name if signed in
+  if (USER_EMAIL) {
+    var nameEl = document.getElementById('boardName');
+    if (!nameEl.value) nameEl.value = USER_EMAIL.split('@')[0];
+  }
+}
+
+function switchBoard(boardId) {
+  CURRENT_BOARD = boardId;
+  buildBoardTabs();
+  loadBoard(boardId);
+}
+
+function loadBoard(boardId) {
+  document.getElementById('boardMessages').innerHTML = '<p class="board-empty">Loading...</p>';
+  var url, promise;
+  if (window.electronAPI && window.electronAPI.loadMessages) {
+    promise = window.electronAPI.loadMessages(boardId);
+  } else {
+    url = APPS_SCRIPT_URL + '?action=getMessages&board=' + encodeURIComponent(boardId) + '&sheetId=' + encodeURIComponent(SHEET_ID);
+    promise = fetch(url).then(function(r) { return r.json(); });
+  }
+  promise.then(function(result) {
+    if (!result.success || !result.messages.length) {
+      document.getElementById('boardMessages').innerHTML = '<p class="board-empty">No messages yet — be the first to post!</p>';
+      return;
+    }
+    document.getElementById('boardMessages').innerHTML = result.messages.map(function(m) {
+      var ts = m.timestamp ? new Date(m.timestamp).toLocaleString() : '';
+      var delBtn = '<button class="btn-delete-msg" onclick="deletePost(\'' + m.id + '\')" title="Delete">✕</button>';
+      return '<div class="board-msg" id="msg-' + m.id + '">' +
+        '<div class="board-msg-header">' +
+          '<span class="board-msg-name">' + escHtml(m.name || 'Anonymous') + '</span>' +
+          '<span style="display:flex;align-items:center;gap:8px;">' +
+            '<span class="board-msg-time">' + ts + '</span>' +
+            delBtn +
+          '</span>' +
+        '</div>' +
+        '<div class="board-msg-text">' + escHtml(m.message) + '</div>' +
+      '</div>';
+    }).join('');
+  }).catch(function() {
+    document.getElementById('boardMessages').innerHTML = '<p class="board-empty">Could not load messages.</p>';
+  });
+}
+
+function submitPost() {
+  var name    = document.getElementById('boardName').value.trim() || 'Anonymous';
+  var message = document.getElementById('boardMessage').value.trim();
+  if (!message) { showToast('Please write a message first'); return; }
+
+  var promise;
+  if (window.electronAPI && window.electronAPI.postMessage) {
+    promise = window.electronAPI.postMessage(CURRENT_BOARD, name, USER_EMAIL, message);
+  } else {
+    var url = APPS_SCRIPT_URL + '?action=postMessage&board=' + encodeURIComponent(CURRENT_BOARD) +
+      '&name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(USER_EMAIL || '') +
+      '&message=' + encodeURIComponent(message) + '&sheetId=' + encodeURIComponent(SHEET_ID);
+    promise = fetch(url).then(function(r) { return r.json(); });
+  }
+  promise.then(function(result) {
+    if (result.success) {
+      document.getElementById('boardMessage').value = '';
+      showToast('Posted!');
+      loadBoard(CURRENT_BOARD);
+    } else {
+      showToast('Could not post — try again');
+    }
+  }).catch(function() { showToast('Could not post — try again'); });
+}
+
+function deletePost(msgId) {
+  var promise;
+  if (window.electronAPI && window.electronAPI.deleteMessage) {
+    promise = window.electronAPI.deleteMessage(msgId);
+  } else {
+    var url = APPS_SCRIPT_URL + '?action=deleteMessage&msgId=' + encodeURIComponent(msgId) + '&sheetId=' + encodeURIComponent(SHEET_ID);
+    promise = fetch(url).then(function(r) { return r.json(); });
+  }
+  promise.then(function(result) {
+    if (result.success) {
+      var el = document.getElementById('msg-' + msgId);
+      if (el) el.remove();
+      showToast('Deleted');
+    } else {
+      showToast('Could not delete');
+    }
+  }).catch(function() { showToast('Could not delete'); });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ━━━ REFRESH ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

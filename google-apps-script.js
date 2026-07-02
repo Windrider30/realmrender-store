@@ -18,11 +18,12 @@
    4. Copy the Web App URL → paste into config-XX.json as appsScriptUrl
    ═══════════════════════════════════════════════════════════════ */
 
-var PRODUCTS_SHEET = 'Products';
-var ACCESS_SHEET   = 'Access';
-var BUNDLES_SHEET  = 'Bundles';
-var SETTINGS_SHEET = 'Settings';
-var NAV_SHEET      = 'Nav';
+var PRODUCTS_SHEET  = 'Products';
+var ACCESS_SHEET    = 'Access';
+var BUNDLES_SHEET   = 'Bundles';
+var SETTINGS_SHEET  = 'Settings';
+var NAV_SHEET       = 'Nav';
+var MESSAGES_SHEET  = 'Messages';
 
 var SPREADSHEET_ID = '';
 
@@ -96,6 +97,18 @@ function handleRequest(e, body) {
 
       case 'getNav':
         result = getNav(sid);
+        break;
+
+      case 'getMessages':
+        result = getMessages(p.board || '', sid);
+        break;
+
+      case 'postMessage':
+        result = postMessage(p.board || '', p.name || 'Anonymous', p.email || '', p.message || '', sid);
+        break;
+
+      case 'deleteMessage':
+        result = deleteMessage(p.msgId || '', sid);
         break;
 
       case 'debug':
@@ -378,10 +391,11 @@ function getSettings(sid) {
 
 
 // ━━━ GET NAV ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// Sheet tab: "Nav" — three columns: Label | Category | URL
+// Sheet tab: "Nav" — four columns: Label | Category | URL | access_required
 // Category filled  → filters store products by that category
 // URL filled       → opens that link in the in-app browser
 // Both filled      → URL takes priority
+// access_required  → product/category ID required to see this nav button
 // Row deleted      → button disappears from the app
 function getNav(sid) {
   var sheet = getSpreadsheet(sid).getSheetByName(NAV_SHEET);
@@ -389,15 +403,85 @@ function getNav(sid) {
   var data = sheet.getDataRange().getValues();
   var nav  = [];
   for (var i = 0; i < data.length; i++) {
-    var label    = String(data[i][0]).trim();
-    var category = String(data[i][1]).trim().toLowerCase();
-    var url      = String(data[i][2]).trim();
+    var label          = String(data[i][0]).trim();
+    var category       = String(data[i][1]).trim().toLowerCase();
+    var url            = String(data[i][2]).trim();
+    var accessRequired = String(data[i][3] || '').trim().toLowerCase();
     // Skip header row and empty rows
     if (!label || label.toLowerCase() === 'label') continue;
     if (!category && !url) continue;
-    nav.push({ label: label, category: category || '', url: url || '' });
+    nav.push({ label: label, category: category || '', url: url || '', accessRequired: accessRequired });
   }
   return { success: true, nav: nav };
+}
+
+
+// ━━━ GET MESSAGES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// board: 'public' | 'buyers' | any category id (e.g. 'rabbit-hole-1')
+function getMessages(board, sid) {
+  var sheet = getOrCreateMessagesSheet(sid);
+  var data  = sheet.getDataRange().getValues();
+  var msgs  = [];
+  for (var i = 1; i < data.length; i++) {
+    var deleted = String(data[i][6]).toLowerCase() === 'true';
+    if (deleted) continue;
+    if (board && String(data[i][1]).toLowerCase().trim() !== board.toLowerCase().trim()) continue;
+    msgs.push({
+      id:        String(data[i][0]),
+      board:     String(data[i][1]),
+      email:     String(data[i][2]),
+      name:      String(data[i][3]),
+      message:   String(data[i][4]),
+      timestamp: String(data[i][5])
+    });
+  }
+  msgs.reverse();
+  return { success: true, messages: msgs };
+}
+
+
+// ━━━ POST MESSAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function postMessage(board, name, email, message, sid) {
+  if (!board)   return { success: false, message: 'Board required' };
+  if (!message || message.trim() === '') return { success: false, message: 'Message cannot be empty' };
+  name    = (name    || 'Anonymous').trim().substring(0, 50);
+  message = message.trim().substring(0, 1000);
+  var id  = Utilities.getUuid();
+  var ts  = new Date().toISOString();
+  var sheet = getOrCreateMessagesSheet(sid);
+  sheet.appendRow([id, board, email || '', name, message, ts, 'false']);
+  return { success: true, message: 'Posted', id: id };
+}
+
+
+// ━━━ DELETE MESSAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+function deleteMessage(msgId, sid) {
+  if (!msgId) return { success: false, message: 'Message ID required' };
+  var sheet = getOrCreateMessagesSheet(sid);
+  var data  = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === msgId) {
+      sheet.getRange(i + 1, 7).setValue('true');
+      return { success: true, message: 'Deleted' };
+    }
+  }
+  return { success: false, message: 'Message not found' };
+}
+
+
+// ━━━ HELPER: Get or create Messages sheet ━━━━━━━━━━━━━━━━━━━━
+function getOrCreateMessagesSheet(sid) {
+  var ss    = getSpreadsheet(sid);
+  var sheet = ss.getSheetByName(MESSAGES_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(MESSAGES_SHEET);
+    sheet.appendRow(['id', 'board', 'email', 'name', 'message', 'timestamp', 'deleted']);
+    sheet.getRange(1, 1, 1, 7).setFontWeight('bold').setBackground('#0D0D0D').setFontColor('#00F0FF');
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(1, 280);
+    sheet.setColumnWidth(5, 400);
+  }
+  return sheet;
 }
 
 

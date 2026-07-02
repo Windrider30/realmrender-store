@@ -54,6 +54,32 @@ ipcMain.handle('load-nav', async () => {
   return await httpsGet(url);
 });
 
+ipcMain.handle('load-messages', async (event, board) => {
+  if (!appsScriptUrl) return { success: false, messages: [] };
+  const url = appsScriptUrl + '?action=getMessages&board=' + encodeURIComponent(board) + '&sheetId=' + encodeURIComponent(sheetId);
+  return await httpsGet(url);
+});
+
+ipcMain.handle('post-message', async (event, board, name, email, message) => {
+  if (!appsScriptUrl) return { success: false, message: 'Not configured' };
+  const url = appsScriptUrl + '?action=postMessage&board=' + encodeURIComponent(board) +
+    '&name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email) +
+    '&message=' + encodeURIComponent(message) + '&sheetId=' + encodeURIComponent(sheetId);
+  return await httpsGet(url);
+});
+
+ipcMain.handle('delete-message', async (event, msgId) => {
+  if (!appsScriptUrl) return { success: false, message: 'Not configured' };
+  const url = appsScriptUrl + '?action=deleteMessage&msgId=' + encodeURIComponent(msgId) + '&sheetId=' + encodeURIComponent(sheetId);
+  return await httpsGet(url);
+});
+
+ipcMain.handle('open-external', (event, url) => {
+  if (!url) return;
+  if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+  shell.openExternal(url);
+});
+
 function createWindow() {
   let cfg = {};
   try {
